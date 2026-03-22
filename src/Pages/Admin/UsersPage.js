@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { Store } from 'react-notifications-component';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
 import '../../Css/pages/admin-users-page.css';
 
 const AdminUsersPage = () => {
   const { getAuthHeaders } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
     national_id: '',
@@ -20,8 +22,7 @@ const AdminUsersPage = () => {
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
-  const adminUsersBase = `${API_BASE_URL}/admin/users`;
-  const legacyAdminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
+  const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
 
   const fetchUsers = useCallback(async (targetPage = page, targetSearch = search) => {
     setLoading(true);
@@ -31,16 +32,9 @@ const AdminUsersPage = () => {
       params.set('per_page', '10');
       if (targetSearch.trim()) params.set('search', targetSearch.trim());
 
-      let response;
-      try {
-        response = await axios.get(`${adminUsersBase}?${params.toString()}`, {
-          headers: getAuthHeaders(),
-        });
-      } catch (primaryError) {
-        response = await axios.get(`${legacyAdminUsersBase}?${params.toString()}`, {
-          headers: getAuthHeaders(),
-        });
-      }
+      const response = await axios.get(`${adminUsersBase}?${params.toString()}`, {
+        headers: getAuthHeaders(),
+      });
 
       const payload = response.data?.data;
       setUsers(payload?.data || []);
@@ -51,6 +45,16 @@ const AdminUsersPage = () => {
       });
     } catch (error) {
       const isUnauthenticated = error?.response?.status === 401;
+      const isRouteMissing = error?.response?.status === 404 || error?.response?.status === 405;
+      if (isUnauthenticated) {
+        navigate('/', { replace: true });
+      }
+      if (isRouteMissing) {
+        // Some production bridges expose create-user only; keep UI usable without breaking page.
+        setUsers([]);
+        setPagination({ current_page: 1, last_page: 1, total: 0 });
+        return;
+      }
       Store.addNotification({
         title: 'خطأ',
         message: isUnauthenticated
@@ -64,7 +68,7 @@ const AdminUsersPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [adminUsersBase, legacyAdminUsersBase, getAuthHeaders, page, search]);
+  }, [adminUsersBase, getAuthHeaders, navigate, page, search]);
 
   useEffect(() => {
     fetchUsers(page, search);
@@ -74,11 +78,7 @@ const AdminUsersPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      try {
-        await axios.post(adminUsersBase, form, { headers: getAuthHeaders() });
-      } catch (primaryError) {
-        await axios.post(legacyAdminUsersBase, form, { headers: getAuthHeaders() });
-      }
+      await axios.post(adminUsersBase, form, { headers: getAuthHeaders() });
       Store.addNotification({
         title: 'نجاح',
         message: 'تم إنشاء المستخدم بنجاح',
@@ -92,6 +92,9 @@ const AdminUsersPage = () => {
       fetchUsers(1, search);
     } catch (error) {
       const isUnauthenticated = error?.response?.status === 401;
+      if (isUnauthenticated) {
+        navigate('/', { replace: true });
+      }
       const validationErrors = error?.response?.data?.errors;
       const firstValidationMessage = validationErrors
         ? Object.values(validationErrors).flat().find(Boolean)

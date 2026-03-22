@@ -2,15 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/AuthContext';
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
 import AdminSidebar from './AdminSidebar';
 import LanguageSwitcher from '../CustomComponents/LanguageSwitcher';
 import '../Css/admin-layout.css';
 
 const AdminLayout = () => {
-  const { t, i18n } = useTranslation(['common']);
-  const { admin, getAuthHeaders } = useAuth();
+  const { i18n } = useTranslation(['common']);
+  const { admin } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isRTL, setIsRTL] = useState(i18n.language === 'ar');
   const [theme, setTheme] = useState(() => localStorage.getItem('admin_theme') || 'light');
@@ -50,34 +48,18 @@ const AdminLayout = () => {
   }, [theme]);
 
   useEffect(() => {
-    let cancelled = false;
-    const fetchNotificationCount = async () => {
-      try {
-        const headers = getAuthHeaders();
-        const res = await axios.get(
-          `${API_BASE_URL}/portallogistice/admin/dashboard/stats`,
-          { headers }
-        );
-
-        const d = res.data?.data || {};
-        const urgent = d.urgentAlerts ?? d.urgent_alerts ?? d.urgent_alert ?? d.urgent ?? 3;
-        const n = Number(urgent);
-        if (!cancelled && Number.isFinite(n)) {
-          setNotificationCount(n);
-          localStorage.setItem('admin_notification_count', String(n));
-        }
-      } catch (e) {
-        // keep fallback
+    // Keep local notification count fallback until dashboard stats endpoint is fully unified in production.
+    const interval = setInterval(() => {
+      const stored = localStorage.getItem('admin_notification_count');
+      const n = stored ? Number(stored) : 0;
+      if (Number.isFinite(n) && n >= 0) {
+        setNotificationCount(n);
       }
-    };
-
-    fetchNotificationCount();
-    const interval = setInterval(fetchNotificationCount, 30000);
+    }, 30000);
     return () => {
-      cancelled = true;
       clearInterval(interval);
     };
-  }, [getAuthHeaders]);
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

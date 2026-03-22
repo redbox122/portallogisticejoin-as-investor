@@ -45,17 +45,9 @@ const AdminContractsPage = () => {
       params.set('per_page', '100');
       if (searchTerm.trim()) params.set('search', searchTerm.trim());
 
-      let response;
-      try {
-        response = await axios.get(`${API_BASE_URL}/admin/users?${params.toString()}`, {
-          headers: getAuthHeaders(),
-        });
-      } catch (e) {
-        // Backward compatibility for prefixed route.
-        response = await axios.get(`${API_BASE_URL}/portallogistice/admin/users?${params.toString()}`, {
-          headers: getAuthHeaders(),
-        });
-      }
+      const response = await axios.get(`${API_BASE_URL}/portallogistice/admin/users?${params.toString()}`, {
+        headers: getAuthHeaders(),
+      });
 
       const payload = response.data?.data;
       setUsers(payload?.data || []);
