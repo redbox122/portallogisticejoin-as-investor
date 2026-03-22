@@ -218,7 +218,7 @@ const AdminOverviewPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [dashboard, setDashboard] = useState(mockDashboard);
+  const [dashboard] = useState(mockDashboard);
   const [search, setSearch] = useState(() => localStorage.getItem('admin_search_query') || '');
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Store } from 'react-notifications-component';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,6 @@ const AdminUsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1); // kept for UI consistency
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
@@ -58,7 +57,6 @@ const AdminUsersPage = () => {
       }));
 
       setForm({ name: '', national_id: '', phone: '', email: '', password: '' });
-      setPage(1);
     } catch (error) {
       const isUnauthenticated = error?.response?.status === 401;
       if (isUnauthenticated) {
@@ -136,7 +134,6 @@ const AdminUsersPage = () => {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setPage(1);
             }}
           />
         </div>
