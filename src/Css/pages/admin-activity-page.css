@@ -1,0 +1,114 @@
+/* Admin Activity Logs Page Styles */
+.admin-activity-page {
+  padding: 0;
+}
+
+.admin-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-export-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.admin-activity-timeline {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-activity-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.admin-activity-item:last-child {
+  border-bottom: none;
+}
+
+.admin-activity-item:hover {
+  background: #f9fafb;
+}
+
+.admin-activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.admin-activity-content {
+  flex: 1;
+}
+
+.admin-activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.admin-activity-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-activity-time {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-activity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-activity-user {
+  font-size: 14px;
+  color: #6b7280;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-activity-meta {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: "Cairo", sans-serif;
+}
+
+@media (max-width: 768px) {
+  .admin-activity-item {
+    flex-direction: column;
+  }
+  
+  .admin-activity-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

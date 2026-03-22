@@ -1,0 +1,364 @@
+/* Admin Contracts Page Styles */
+.admin-contracts-page {
+  padding: 0;
+}
+
+/* Contract Tabs */
+.contract-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.contract-tab {
+  padding: 12px 20px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6b7280;
+  font-size: 14px;
+  font-family: "Cairo", sans-serif;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.contract-tab:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.contract-tab.active {
+  background: #ffffff;
+  color: #073491;
+  border-bottom-color: #073491;
+  font-weight: 700;
+}
+
+.tab-badge {
+  background: #073491;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+.contract-tab.active .tab-badge {
+  background: #073491;
+}
+
+.contract-tab:not(.active) .tab-badge {
+  background: #9ca3af;
+}
+
+.tab-badge.urgent {
+  background: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Receipt Status Badges */
+.receipt-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Cairo", sans-serif;
+  margin-top: 4px;
+}
+
+.receipt-status-badge.receipt-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.receipt-status-badge.receipt-uploaded {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.receipt-status-badge.receipt-overdue {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.receipt-status-badge.receipt-approved {
+  background: #d1fae5;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.receipt-status-badge.receipt-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.deadline-countdown {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Responsive Tabs */
+@media (max-width: 768px) {
+  .contract-tabs {
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .contract-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .contract-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .tab-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+/* Contracts Grouped by User */
+.contracts-by-user-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.user-contracts-group {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-contracts-group:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.user-contracts-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border-bottom: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.user-contracts-header:hover {
+  background: linear-gradient(135deg, #f3f4f6 0%, #f9fafb 100%);
+}
+
+.user-contracts-header.expanded {
+  background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+  border-bottom-color: #073491;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-name-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.expand-icon {
+  font-size: 14px;
+  color: #6b7280;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 20px;
+  text-align: center;
+}
+
+.user-contracts-header.expanded .expand-icon {
+  transform: rotate(90deg);
+  color: #073491;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.user-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+  color: #6b7280;
+  font-family: "Cairo", sans-serif;
+}
+
+.user-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-id {
+  font-weight: 600;
+  color: #073491;
+}
+
+.user-email::before {
+  content: "📧";
+  margin-inline-end: 4px;
+}
+
+.user-phone::before {
+  content: "📞";
+  margin-inline-end: 4px;
+}
+
+.user-stats {
+  display: flex;
+  align-items: center;
+}
+
+.contract-count-badge {
+  background: linear-gradient(135deg, #073491 0%, #1e4fad 100%);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Cairo", sans-serif;
+  box-shadow: 0 2px 8px rgba(7, 52, 145, 0.2);
+}
+
+.user-contracts-content {
+  padding: 24px;
+  background: #ffffff;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-contracts-content .admin-table {
+  margin: 0;
+}
+
+.user-contracts-content .admin-table thead {
+  background: #f9fafb;
+}
+
+.user-contracts-content .admin-table th {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  font-family: "Cairo", sans-serif;
+}
+
+.user-contracts-content .admin-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
+  font-family: "Cairo", sans-serif;
+}
+
+.user-contracts-content .admin-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.user-contracts-content .admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-contracts-header {
+    padding: 16px;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .user-name-section {
+    width: 100%;
+  }
+  
+  .user-stats {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .user-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .user-contracts-content {
+    padding: 16px;
+    overflow-x: auto;
+  }
+  
+  .user-contracts-content .admin-table {
+    font-size: 12px;
+  }
+  
+  .user-contracts-content .admin-table th,
+  .user-contracts-content .admin-table td {
+    padding: 10px 8px;
+  }
+}

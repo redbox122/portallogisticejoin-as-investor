@@ -1,0 +1,320 @@
+/* Action Required Card - matches overview glass card style */
+.action-required-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.action-section {
+  margin-bottom: 24px;
+}
+
+.action-section:last-child {
+  margin-bottom: 0;
+}
+
+.action-section.profile-completion {
+  border-bottom: 2px solid #fef3c7;
+  padding-bottom: 24px;
+}
+
+.action-section.wire-receipt {
+  border-bottom: none;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.action-section.profile-completion .section-icon {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+}
+
+.action-section.wire-receipt .section-icon {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #3b82f6;
+}
+
+.section-content {
+  flex: 1;
+}
+
+.section-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.section-message {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Documents List */
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.document-item:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.document-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.document-info i {
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.document-info span:first-of-type {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.missing {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge.approved {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* Upload Button */
+.upload-btn,
+.upload-receipt-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #073491 0%, #1e4fad 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-family: "Cairo", sans-serif;
+}
+
+.upload-btn:hover:not(:disabled),
+.upload-receipt-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #052a7a 0%, #073491 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(7, 52, 145, 0.3);
+}
+
+.upload-btn:disabled,
+.upload-receipt-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upload-btn i,
+.upload-receipt-btn i {
+  font-size: 14px;
+}
+
+/* View Profile Link */
+.view-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #073491;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: all 0.2s;
+  font-family: "Cairo", sans-serif;
+}
+
+.view-profile-link:hover {
+  color: #052a7a;
+  gap: 12px;
+}
+
+.view-profile-link i {
+  font-size: 12px;
+}
+
+/* Contracts List */
+.contracts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.contract-receipt-item {
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.contract-receipt-item:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.contract-receipt-item.overdue {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.contract-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.contract-header h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.contract-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #073491;
+  font-family: "Cairo", sans-serif;
+}
+
+.overdue-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fee2e2;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.overdue-warning i {
+  font-size: 18px;
+}
+
+.deadline-info {
+  margin-bottom: 16px;
+}
+
+.deadline-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .action-required-card {
+    padding: 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .document-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .upload-btn,
+  .upload-receipt-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .contract-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

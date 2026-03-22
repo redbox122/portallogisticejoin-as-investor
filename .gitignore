@@ -1,0 +1,34 @@
+# Frontend
+node_modules/
+build/
+old_build/
+static/
+.cache/
+.env
+.env.*
+!.env.example
+
+# Backend (Laravel)
+tasheel-backend/vendor/
+tasheel-backend/node_modules/
+tasheel-backend/.env
+tasheel-backend/storage/logs/
+tasheel-backend/bootstrap/cache/*.php
+vendor/
+
+# Archives / temp
+*.zip
+*.tmp
+*.temp
+tmp_*
+fix_*.php
+plain_*.php
+patch_*.py
+
+# OS / tooling
+.DS_Store
+.cursor/
+.vscode/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

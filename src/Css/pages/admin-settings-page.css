@@ -1,0 +1,111 @@
+/* Admin Settings Page Styles */
+.admin-settings-page {
+  padding: 0;
+}
+
+.admin-settings-content {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-settings-section {
+  margin-bottom: 32px;
+}
+
+.admin-settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.admin-settings-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 24px 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-form-input {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Cairo", sans-serif;
+  background: #ffffff;
+  color: #1f2937;
+  transition: all 0.2s;
+}
+
+.admin-form-input:focus {
+  outline: none;
+  border-color: #073491;
+  box-shadow: 0 0 0 3px rgba(7, 52, 145, 0.1);
+}
+
+.admin-form-input.error {
+  border-color: #ef4444;
+}
+
+.admin-form-error {
+  font-size: 12px;
+  color: #ef4444;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.admin-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #073491;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-save-btn:hover:not(:disabled) {
+  background: #052a7a;
+  transform: translateY(-1px);
+}
+
+.admin-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .admin-settings-content {
+    padding: 20px;
+  }
+}

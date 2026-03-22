@@ -1,0 +1,277 @@
+.data-comparison-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.data-comparison-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.data-comparison-modal .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+}
+
+.data-comparison-modal .modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.data-comparison-modal .modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.data-comparison-modal .modal-close:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.data-comparison-modal .modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.comparison-alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.comparison-alert.alert-danger {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+}
+
+.comparison-alert.alert-warning {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+
+.comparison-alert i {
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.comparison-alert strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.comparison-section {
+  margin-bottom: 24px;
+}
+
+.comparison-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comparison-table-container {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.comparison-table thead {
+  background: #f9fafb;
+}
+
+.comparison-table th {
+  padding: 12px 16px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.comparison-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table .critical-row {
+  background: #fee2e2;
+}
+
+.comparison-table .warning-row {
+  background: #fef3c7;
+}
+
+.comparison-table .field-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.comparison-table .current-value,
+.comparison-table .extracted-value {
+  color: #374151;
+  word-break: break-word;
+}
+
+.comparison-table .empty-value {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.comparison-table .status-cell {
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.matches-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.match-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  color: #166534;
+  font-size: 14px;
+}
+
+.match-item i {
+  color: #22c55e;
+}
+
+.text-success {
+  color: #22c55e;
+}
+
+.data-comparison-modal .modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f9fafb;
+}
+
+.data-comparison-modal .btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.data-comparison-modal .btn-primary {
+  background: #073491;
+  color: white;
+}
+
+.data-comparison-modal .btn-primary:hover {
+  background: #052a6e;
+}
+
+.data-comparison-modal .btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.data-comparison-modal .btn-secondary:hover {
+  background: #4b5563;
+}
+
+.data-comparison-modal .btn-outline {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.data-comparison-modal .btn-outline:hover {
+  background: #f9fafb;
+}
+
+/* RTL Support */
+[dir="rtl"] .comparison-table th,
+[dir="rtl"] .comparison-table td {
+  text-align: right;
+}
+
+[dir="ltr"] .comparison-table th,
+[dir="ltr"] .comparison-table td {
+  text-align: left;
+}

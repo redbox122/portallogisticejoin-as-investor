@@ -1,0 +1,31 @@
+# Enable Rewrite Engine for React Router
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Don't rewrite files or directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Rewrite everything else to index.html to allow React Router to handle routing
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Set directory index
+<IfModule mod_dir.c>
+  DirectoryIndex index.html index.php
+</IfModule>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the "ea-php84" package as the default "PHP" programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
+# CORS headers temporarily disabled for testing
+# <IfModule mod_headers.c>
+#   Header always set Access-Control-Allow-Origin "*"
+#   Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+#   Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-LANG"
+# </IfModule>
+

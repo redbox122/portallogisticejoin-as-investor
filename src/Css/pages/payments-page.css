@@ -1,0 +1,644 @@
+/* Payments Page */
+.payments-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.payments-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.report-result-card {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.report-result-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.report-result-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #10b981;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.report-result-content h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #065f46;
+}
+
+.report-result-content p {
+  margin: 0;
+  color: #047857;
+  font-size: 13px;
+}
+
+.report-result-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #065f46;
+  padding: 6px;
+}
+
+.report-result-steps {
+  margin: 12px 0 0 0;
+  padding-left: 18px;
+  color: #065f46;
+}
+
+.report-result-contact {
+  margin-top: 12px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #065f46;
+  font-size: 13px;
+}
+
+.payments-calendar {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.calendar-col h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.calendar-col.overdue h3 {
+  color: #991b1b;
+}
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.calendar-col.overdue .calendar-row {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.calendar-date {
+  font-weight: 700;
+  color: #111827;
+  font-size: 13px;
+}
+
+.calendar-amount {
+  color: #374151;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.calendar-count {
+  background: #073491;
+  color: #ffffff;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.calendar-empty {
+  color: #6b7280;
+  margin: 0;
+}
+
+.payments-pagination-hint {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.summary-icon.received {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+}
+
+.summary-icon.pending {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+}
+
+.summary-icon.next {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+}
+
+.summary-content h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.summary-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 0 0;
+}
+
+.payments-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.payments-table-container {
+  overflow-x: auto;
+}
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payments-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 2px solid #e5e7eb;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.payments-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+  vertical-align: middle;
+}
+
+.payment-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.payments-table td:first-child,
+.payments-table th:first-child {
+  padding-left: 24px;
+}
+
+.payments-table td:last-child,
+.payments-table th:last-child {
+  padding-right: 24px;
+}
+
+/* Ensure numeric and date columns are right-aligned */
+.payments-table td:nth-child(2),
+.payments-table th:nth-child(2),
+.payments-table td:nth-child(3),
+.payments-table th:nth-child(3),
+.payments-table td:nth-child(4),
+.payments-table th:nth-child(4) {
+  text-align: left;
+}
+
+.payments-table tr:hover {
+  background: #f9fafb;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.status-badge.sent {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.received {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.reported_missing {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.report-btn {
+  padding: 6px 12px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin: 0 auto;
+}
+
+.report-btn:hover {
+  background: #fecaca;
+}
+
+/* Contracts Accordion */
+.contracts-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contract-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.contract-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.contract-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.contract-header:hover {
+  background: #f9fafb;
+}
+
+.contract-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contract-arrow {
+  color: #6b7280;
+  font-size: 14px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.contract-header:hover .contract-arrow {
+  color: #073491;
+}
+
+.contract-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.contract-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.contract-summary {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.contract-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contract-status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.contract-status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.contract-status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.contract-payments-content {
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+  }
+}
+
+.contract-payments-content .payments-table-container {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.contract-payments-content .payments-table {
+  margin: 0;
+  width: 100%;
+  table-layout: auto;
+}
+
+.contract-payments-content .payments-table-container {
+  padding: 16px 0;
+}
+
+.contract-payments-content .payments-table th {
+  background: #f3f4f6;
+  font-size: 13px;
+  padding: 12px 16px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.contract-payments-content .payments-table th:first-child {
+  padding-left: 40px;
+}
+
+.contract-payments-content .payments-table th:last-child {
+  padding-right: 24px;
+}
+
+.contract-payments-content .payments-table td {
+  padding: 14px 16px;
+  background: #ffffff;
+  vertical-align: middle;
+}
+
+.contract-payments-content .payments-table td:first-child {
+  padding-left: 40px;
+}
+
+.contract-payments-content .payments-table td:last-child {
+  padding-right: 24px;
+}
+
+/* Column width management for better alignment */
+.contract-payments-content .payments-table th:nth-child(1),
+.contract-payments-content .payments-table td:nth-child(1) {
+  width: 10%;
+  min-width: 100px;
+}
+
+.contract-payments-content .payments-table th:nth-child(2),
+.contract-payments-content .payments-table td:nth-child(2) {
+  width: 15%;
+  min-width: 120px;
+}
+
+.contract-payments-content .payments-table th:nth-child(3),
+.contract-payments-content .payments-table td:nth-child(3) {
+  width: 18%;
+  min-width: 140px;
+}
+
+.contract-payments-content .payments-table th:nth-child(4),
+.contract-payments-content .payments-table td:nth-child(4) {
+  width: 18%;
+  min-width: 140px;
+}
+
+.contract-payments-content .payments-table th:nth-child(5),
+.contract-payments-content .payments-table td:nth-child(5) {
+  width: 15%;
+  min-width: 120px;
+  text-align: center;
+}
+
+.contract-payments-content .payments-table th:nth-child(6),
+.contract-payments-content .payments-table td:nth-child(6) {
+  width: 24%;
+  min-width: 180px;
+  text-align: center;
+}
+
+/* Align status badges and buttons */
+.contract-payments-content .payments-table td:nth-child(5) .status-badge {
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.contract-payments-content .payments-table td:nth-child(6) {
+  text-align: center;
+}
+
+.contract-payments-content .payments-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.contract-payments-content .payments-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.contract-payments-content .payments-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* RTL Support */
+[dir="rtl"] .payments-table th,
+[dir="rtl"] .payments-table td {
+  text-align: right;
+}
+
+[dir="rtl"] .payments-table th:first-child,
+[dir="rtl"] .payments-table td:first-child {
+  padding-right: 24px;
+  padding-left: 16px;
+}
+
+[dir="rtl"] .payments-table th:last-child,
+[dir="rtl"] .payments-table td:last-child {
+  padding-left: 24px;
+  padding-right: 16px;
+}
+
+[dir="rtl"] .contract-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .contract-header-left {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .contract-payments-content .payments-table th:first-child,
+[dir="rtl"] .contract-payments-content .payments-table td:first-child {
+  padding-right: 40px;
+  padding-left: 16px;
+}
+
+[dir="rtl"] .contract-payments-content .payments-table th:last-child,
+[dir="rtl"] .contract-payments-content .payments-table td:last-child {
+  padding-left: 24px;
+  padding-right: 16px;
+}
+
+[dir="rtl"] .contract-payments-content .payments-table td:nth-child(5),
+[dir="rtl"] .contract-payments-content .payments-table th:nth-child(5),
+[dir="rtl"] .contract-payments-content .payments-table td:nth-child(6),
+[dir="rtl"] .contract-payments-content .payments-table th:nth-child(6) {
+  text-align: center;
+}
+
+[dir="rtl"] .contract-payments-content .payments-table td:nth-child(5) .status-badge,
+[dir="rtl"] .contract-payments-content .payments-table td:nth-child(6) .report-btn {
+  margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contract-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .contract-header-right {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 32px;
+  }
+
+  [dir="rtl"] .contract-header-right {
+    padding-left: 0;
+    padding-right: 32px;
+    justify-content: flex-end;
+  }
+
+  .contract-payments-content {
+    overflow-x: auto;
+  }
+
+  .payments-table th,
+  .payments-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .contract-payments-content .payments-table th,
+  .contract-payments-content .payments-table td {
+    padding: 10px 12px;
+  }
+
+  .contract-payments-content .payments-table th:first-child,
+  .contract-payments-content .payments-table td:first-child {
+    padding-left: 24px;
+  }
+
+  [dir="rtl"] .contract-payments-content .payments-table th:first-child,
+  [dir="rtl"] .contract-payments-content .payments-table td:first-child {
+    padding-left: 12px;
+    padding-right: 24px;
+  }
+}

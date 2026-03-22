@@ -1,0 +1,304 @@
+/* Admin Overview Page Styles */
+.admin-overview-page {
+  padding: 0;
+}
+
+.admin-page-header {
+  margin-bottom: 32px;
+}
+
+.admin-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-page-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+.admin-page-loading p {
+  color: #073491;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: "Cairo", sans-serif;
+}
+
+/* Quick Stats Grid */
+.admin-quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.admin-quick-stat-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.admin-quick-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: #073491;
+}
+
+.admin-quick-stat-card.urgent {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.admin-quick-stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.admin-quick-stat-content {
+  flex: 1;
+}
+
+.admin-quick-stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-quick-stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-quick-stat-arrow {
+  color: #9ca3af;
+  font-size: 20px;
+  transition: transform 0.3s;
+}
+
+.admin-quick-stat-card:hover .admin-quick-stat-arrow {
+  transform: translateX(4px);
+}
+
+[dir="rtl"] .admin-quick-stat-card:hover .admin-quick-stat-arrow {
+  transform: translateX(-4px);
+}
+
+/* Overview Sections */
+.admin-overview-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-view-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #073491;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-view-all-btn:hover {
+  background: #052a7a;
+  transform: translateY(-1px);
+}
+
+/* Recent List */
+.admin-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.admin-recent-item:hover {
+  background: #f3f4f6;
+  transform: translateX(2px);
+}
+
+[dir="rtl"] .admin-recent-item:hover {
+  transform: translateX(-2px);
+}
+
+.admin-recent-item-info h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-recent-item-info p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-status-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-status-badge.status-approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.admin-status-badge.status-denied {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Quick Actions */
+.admin-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.admin-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: "Cairo", sans-serif;
+}
+
+.admin-action-btn:hover {
+  border-color: #073491;
+  background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(7, 52, 145, 0.1);
+}
+
+.admin-action-btn i {
+  font-size: 32px;
+  color: #073491;
+}
+
+.admin-action-btn span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Empty State */
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.admin-empty-state i {
+  font-size: 64px;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.admin-empty-state p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-quick-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-quick-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
