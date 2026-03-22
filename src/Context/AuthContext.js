@@ -213,6 +213,8 @@ export const AuthProvider = ({ children }) => {
 
         // تخزين التوكن ثم التوجيه للوحة التحكم
         writeStoredToken(authToken);
+        // Explicit key expected by some pages and debugging steps.
+        localStorage.setItem('token', authToken);
         localStorage.setItem(`portal_logistics_${type}`, JSON.stringify(userData));
         writeStoredUserType(type);
 

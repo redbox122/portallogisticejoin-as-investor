@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Store } from 'react-notifications-component';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
+import { getAuthHeaders } from '../../utils/api';
 import '../../Css/pages/admin-users-page.css';
 
 const AdminUsersPage = () => {
-  const { getAuthHeaders } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
@@ -21,7 +20,7 @@ const AdminUsersPage = () => {
   const [search, setSearch] = useState('');
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
-  const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
+  const adminUsersBase = `${API_BASE_URL}/admin/users`;
 
   useEffect(() => {
     // In production bridge, users-list GET may be unavailable.
@@ -33,6 +32,8 @@ const AdminUsersPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
+      // Debug token existence before request.
+      console.log('TOKEN:', localStorage.getItem('token'));
       await axios.post(adminUsersBase, form, { headers: getAuthHeaders() });
       Store.addNotification({
         title: 'نجاح',

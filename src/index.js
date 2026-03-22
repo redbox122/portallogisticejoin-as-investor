@@ -60,6 +60,7 @@ import PaymentsRouteGuard from './Components/PaymentsRouteGuard';
 import './i18n/i18n.js';
 import { ReactNotifications } from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
+import { setupAxios401Interceptor } from './utils/api';
 
 /* Apply saved theme + RTL before first paint (user dashboard + global) */
 (() => {
@@ -75,6 +76,8 @@ import 'react-notifications-component/dist/theme.css';
     /* ignore */
   }
 })();
+
+setupAxios401Interceptor();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
