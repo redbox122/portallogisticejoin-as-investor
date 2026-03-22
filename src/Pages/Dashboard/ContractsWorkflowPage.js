@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
@@ -19,7 +19,7 @@ const ContractsWorkflowPage = () => {
   const [loading, setLoading] = useState(true);
   const [submittingId, setSubmittingId] = useState(null);
 
-  const loadContracts = async () => {
+  const loadContracts = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/contracts`, {
@@ -31,11 +31,11 @@ const ContractsWorkflowPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAuthHeaders]);
 
   useEffect(() => {
     loadContracts();
-  }, []);
+  }, [loadContracts]);
 
   const verifyNafath = async (contractId) => {
     setSubmittingId(contractId);
