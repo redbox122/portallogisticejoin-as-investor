@@ -1,4 +1,148 @@
 /* Admin Users Page Styles */
 .admin-users-page {
-  padding: 0;
+  padding: 12px;
+  display: grid;
+  gap: 16px;
+}
+
+.users-create-card,
+.users-table-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.users-create-card h2,
+.users-table-card h3 {
+  margin: 0 0 12px;
+}
+
+.users-create-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.users-create-form .form-group {
+  display: grid;
+  gap: 6px;
+}
+
+.users-create-form .form-group label {
+  font-weight: 700;
+  color: #374151;
+  font-size: 13px;
+}
+
+.users-create-form input {
+  min-height: 42px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 10px;
+}
+
+.create-btn {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.users-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.users-search {
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 10px;
+  min-width: 260px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  text-align: right;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.users-table th {
+  color: #64748b;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.action-btn {
+  border: 1px solid #dbe2ee;
+  background: #fff;
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination button {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .users-create-form {
+    grid-template-columns: 1fr;
+  }
+  .users-search {
+    min-width: 0;
+    width: 100%;
+  }
+  .users-table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

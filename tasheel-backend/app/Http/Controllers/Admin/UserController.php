@@ -12,29 +12,71 @@ use Illuminate\Support\Str;
 class UserController extends Controller
 {
     /**
+     * GET /api/admin/users
+     * List users (admin only) with pagination and search.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $search = trim((string) $request->query('search', ''));
+        $perPage = max(1, min(100, (int) $request->query('per_page', 15)));
+
+        $query = User::query()
+            ->where('role', User::ROLE_USER)
+            ->orderByDesc('id');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('national_id', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $users->through(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'national_id' => $user->national_id,
+                    'phone' => $user->phone,
+                    'email' => $user->email,
+                    'status' => $user->status,
+                    'role' => $user->role,
+                    'created_at' => optional($user->created_at)->toIso8601String(),
+                ];
+            }),
+        ]);
+    }
+
+    /**
      * POST /api/portallogistice/admin/users
      * Create a new user (by admin).
      */
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:users,email',
-            'phone' => 'required|string|max:20|unique:users,phone',
-            'national_id' => 'required|string|max:20|unique:users,national_id',
-            'password' => 'nullable|string|min:6',
-        ]);
+        $validated = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+                'national_id' => 'required|string|max:20|unique:users,national_id',
+                'phone' => 'nullable|string|max:20|unique:users,phone',
+                'email' => 'nullable|email|unique:users,email',
+            ],
+            [
+                'national_id.unique' => 'رقم الهوية مستخدم مسبقًا',
+            ]
+        );
 
-        $password = $validated['password'] ?? Str::random(10);
-        $name = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        $password = Str::random(12);
+        $name = trim((string) $validated['name']);
 
         $user = User::create([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'] ?? null,
-            'name' => $name ?: $validated['first_name'],
+            'first_name' => $name,
+            'last_name' => null,
+            'name' => $name,
             'email' => $validated['email'] ?? null,
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'national_id' => $validated['national_id'],
             'password' => Hash::make($password),
             'role' => User::ROLE_USER,
@@ -48,7 +90,7 @@ class UserController extends Controller
             'message' => 'تم إنشاء المستخدم بنجاح',
             'data' => [
                 'user' => $user->toApiArray(),
-                'temp_password' => $password, // للتسليم للمدير فقط
+                'generated_password' => $password,
             ],
         ], 201);
     }

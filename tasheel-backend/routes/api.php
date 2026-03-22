@@ -71,6 +71,8 @@ Route::middleware('auth.token')->group(function () {
 });
 
 Route::middleware(['auth.token', 'admin'])->group(function () {
+    Route::get('admin/users', [AdminUserController::class, 'index']);
+    Route::post('admin/users', [AdminUserController::class, 'store']);
     Route::post('contracts', [ContractController::class, 'store']);
     Route::post('contracts/{id}/send', [ContractController::class, 'send']);
     Route::post('contracts/{id}/admin-approve', [ContractController::class, 'adminApprove']);
@@ -111,6 +113,7 @@ Route::prefix('portallogistice')->group(function () {
 
     // ---- Protected (admin only) ----
     Route::prefix('admin')->middleware(['auth.token', 'admin'])->group(function () {
+        Route::get('users', [AdminUserController::class, 'index']);
         Route::post('logout', [AuthController::class, 'adminLogout']);
         Route::post('users', [AdminUserController::class, 'store']);
     });

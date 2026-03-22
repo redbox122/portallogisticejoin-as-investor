@@ -79,9 +79,12 @@ const UserManagement = () => {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
+      const isUnauthenticated = error.response?.status === 401;
       Store.addNotification({
         title: t('admin.error.title'),
-        message: error.response?.data?.message || t('admin.error.fetch_users'),
+        message: isUnauthenticated
+          ? 'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.'
+          : (error.response?.data?.message || t('admin.error.fetch_users')),
         type: 'danger',
         insert: 'top',
         container: 'top-right',
@@ -453,7 +456,10 @@ const UserManagement = () => {
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      const errorMessage = error.response?.data?.message || error.message || t('admin.error.create_user');
+      const isUnauthenticated = error.response?.status === 401;
+      const errorMessage = isUnauthenticated
+        ? 'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.'
+        : (error.response?.data?.message || error.message || t('admin.error.create_user'));
       
       // Handle validation errors
       if (error.response?.data?.errors) {

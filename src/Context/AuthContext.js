@@ -3,6 +3,44 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
 const AuthContext = createContext();
+const TOKEN_KEYS = ['portal_logistics_token', 'token', 'auth_token', 'admin_token', 'user_token'];
+const USER_TYPE_KEYS = ['portal_logistics_user_type', 'user_type'];
+
+const readStoredToken = () => {
+  for (const key of TOKEN_KEYS) {
+    const raw = localStorage.getItem(key);
+    if (raw && String(raw).trim()) {
+      return String(raw).trim();
+    }
+  }
+  return null;
+};
+
+const writeStoredToken = (value) => {
+  TOKEN_KEYS.forEach((key) => localStorage.setItem(key, value));
+};
+
+const clearStoredToken = () => {
+  TOKEN_KEYS.forEach((key) => localStorage.removeItem(key));
+};
+
+const readStoredUserType = () => {
+  for (const key of USER_TYPE_KEYS) {
+    const raw = localStorage.getItem(key);
+    if (raw && String(raw).trim()) {
+      return String(raw).trim();
+    }
+  }
+  return null;
+};
+
+const writeStoredUserType = (value) => {
+  USER_TYPE_KEYS.forEach((key) => localStorage.setItem(key, value));
+};
+
+const clearStoredUserType = () => {
+  USER_TYPE_KEYS.forEach((key) => localStorage.removeItem(key));
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -26,8 +64,8 @@ export const AuthProvider = ({ children }) => {
     let isMounted = true;
     
     const initAuth = async () => {
-      const storedToken = localStorage.getItem('portal_logistics_token');
-      const storedUserType = localStorage.getItem('portal_logistics_user_type');
+      const storedToken = readStoredToken();
+      const storedUserType = readStoredUserType();
       
       if (storedToken && storedUserType) {
         // We have stored auth data, restore it
@@ -78,8 +116,8 @@ export const AuthProvider = ({ children }) => {
   // Check if user is authenticated on app load
   const checkAuth = async () => {
     try {
-      const storedToken = localStorage.getItem('portal_logistics_token');
-      const storedUserType = localStorage.getItem('portal_logistics_user_type');
+      const storedToken = readStoredToken();
+      const storedUserType = readStoredUserType();
       
       if (storedToken && storedUserType) {
         setToken(storedToken);
@@ -174,9 +212,9 @@ export const AuthProvider = ({ children }) => {
         }
 
         // تخزين التوكن ثم التوجيه للوحة التحكم
-        localStorage.setItem('portal_logistics_token', authToken);
+        writeStoredToken(authToken);
         localStorage.setItem(`portal_logistics_${type}`, JSON.stringify(userData));
-        localStorage.setItem('portal_logistics_user_type', type);
+        writeStoredUserType(type);
 
         // Update state IMMEDIATELY and SYNCHRONOUSLY
         setToken(authToken);
@@ -222,8 +260,8 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = async () => {
     try {
-      const storedToken = localStorage.getItem('portal_logistics_token');
-      const storedUserType = localStorage.getItem('portal_logistics_user_type');
+      const storedToken = readStoredToken();
+      const storedUserType = readStoredUserType();
       
       if (storedToken) {
         const endpoint = storedUserType === 'admin'
@@ -241,10 +279,10 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       // Clear localStorage
-      localStorage.removeItem('portal_logistics_token');
+      clearStoredToken();
       localStorage.removeItem('portal_logistics_user');
       localStorage.removeItem('portal_logistics_admin');
-      localStorage.removeItem('portal_logistics_user_type');
+      clearStoredUserType();
 
       // Clear state
       setToken(null);
@@ -284,7 +322,7 @@ export const AuthProvider = ({ children }) => {
 
   // Get auth headers for API calls
   const getAuthHeaders = () => {
-    const storedToken = localStorage.getItem('portal_logistics_token');
+    const storedToken = readStoredToken();
     const lang = localStorage.getItem('i18nextLng') || 'ar';
     
     if (!storedToken) {
