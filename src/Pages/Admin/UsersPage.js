@@ -19,6 +19,8 @@ const AdminUsersPage = () => {
   const [page, setPage] = useState(1);
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
+  const adminUsersBase = `${API_BASE_URL}/admin/users`;
+  const legacyAdminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
 
   const fetchUsers = useCallback(async (targetPage = page, targetSearch = search) => {
     setLoading(true);
@@ -28,9 +30,16 @@ const AdminUsersPage = () => {
       params.set('per_page', '10');
       if (targetSearch.trim()) params.set('search', targetSearch.trim());
 
-      const response = await axios.get(`${API_BASE_URL}/admin/users?${params.toString()}`, {
-        headers: getAuthHeaders(),
-      });
+      let response;
+      try {
+        response = await axios.get(`${adminUsersBase}?${params.toString()}`, {
+          headers: getAuthHeaders(),
+        });
+      } catch (primaryError) {
+        response = await axios.get(`${legacyAdminUsersBase}?${params.toString()}`, {
+          headers: getAuthHeaders(),
+        });
+      }
 
       const payload = response.data?.data;
       setUsers(payload?.data || []);
@@ -54,7 +63,7 @@ const AdminUsersPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeaders, page, search]);
+  }, [adminUsersBase, legacyAdminUsersBase, getAuthHeaders, page, search]);
 
   useEffect(() => {
     fetchUsers(page, search);
@@ -64,7 +73,11 @@ const AdminUsersPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await axios.post(`${API_BASE_URL}/admin/users`, form, { headers: getAuthHeaders() });
+      try {
+        await axios.post(adminUsersBase, form, { headers: getAuthHeaders() });
+      } catch (primaryError) {
+        await axios.post(legacyAdminUsersBase, form, { headers: getAuthHeaders() });
+      }
       Store.addNotification({
         title: 'نجاح',
         message: 'تم إنشاء المستخدم بنجاح',

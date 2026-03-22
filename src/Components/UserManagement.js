@@ -51,6 +51,8 @@ const UserManagement = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [sendEmail, setSendEmail] = useState(false);
+  const adminUsersBase = `${API_BASE_URL}/admin/users`;
+  const legacyAdminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -63,10 +65,13 @@ const UserManagement = () => {
       params.append('per_page', '15');
       params.append('page', currentPage.toString());
 
-      const response = await axios.get(
-        `${API_BASE_URL}/portallogistice/admin/users?${params.toString()}`,
-        { headers }
-      );
+      let response;
+      try {
+        response = await axios.get(`${adminUsersBase}?${params.toString()}`, { headers });
+      } catch (primaryError) {
+        // Backward compatibility with older backend route layout.
+        response = await axios.get(`${legacyAdminUsersBase}?${params.toString()}`, { headers });
+      }
 
       if (response.data.success) {
         setUsers(response.data.data.data || []);
@@ -415,11 +420,13 @@ const UserManagement = () => {
         userData.send_email = true;
       }
       
-      const response = await axios.post(
-        `${API_BASE_URL}/portallogistice/admin/users`,
-        userData,
-        { headers }
-      );
+      let response;
+      try {
+        response = await axios.post(adminUsersBase, userData, { headers });
+      } catch (primaryError) {
+        // Backward compatibility with older backend route layout.
+        response = await axios.post(legacyAdminUsersBase, userData, { headers });
+      }
 
       if (response.data.success) {
         // Show different message if email was sent

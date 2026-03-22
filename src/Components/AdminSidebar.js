@@ -36,6 +36,12 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
       label: 'العقود',
     },
     {
+      id: 'users',
+      path: '/admin/users',
+      icon: 'fa-users',
+      label: 'المستخدمين',
+    },
+    {
       id: 'reports',
       path: '/admin/statistics',
       icon: 'fa-chart-line',

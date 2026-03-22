@@ -28,12 +28,44 @@ const AdminContractsPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [tab, setTab] = useState('pending');
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
   const [form, setForm] = useState({
-    national_id: '',
+    user_id: '',
     type: 'sale',
     title: '',
     file: null,
   });
+
+  const fetchUsers = useCallback(async (searchTerm = '') => {
+    setUsersLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set('per_page', '100');
+      if (searchTerm.trim()) params.set('search', searchTerm.trim());
+
+      let response;
+      try {
+        response = await axios.get(`${API_BASE_URL}/admin/users?${params.toString()}`, {
+          headers: getAuthHeaders(),
+        });
+      } catch (e) {
+        // Backward compatibility for prefixed route.
+        response = await axios.get(`${API_BASE_URL}/portallogistice/admin/users?${params.toString()}`, {
+          headers: getAuthHeaders(),
+        });
+      }
+
+      const payload = response.data?.data;
+      setUsers(payload?.data || []);
+    } catch (e) {
+      console.error('Failed to fetch users for contract assignment', e);
+      setUsers([]);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, [getAuthHeaders]);
 
   const fetchContracts = useCallback(async () => {
     setLoading(true);
@@ -52,6 +84,10 @@ const AdminContractsPage = () => {
   useEffect(() => {
     fetchContracts();
   }, [fetchContracts]);
+
+  useEffect(() => {
+    fetchUsers(userSearch);
+  }, [fetchUsers, userSearch]);
 
   const filteredContracts = useMemo(
     () => contracts.filter(TAB_FILTERS[tab]),
@@ -92,7 +128,7 @@ const AdminContractsPage = () => {
     e.preventDefault();
     setSubmitting(true);
     const data = new FormData();
-    data.append('national_id', form.national_id);
+    data.append('user_id', form.user_id);
     data.append('type', form.type);
     data.append('title', form.title);
     if (form.file) data.append('file', form.file);
@@ -104,7 +140,7 @@ const AdminContractsPage = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setForm({ national_id: '', type: 'sale', title: '', file: null });
+      setForm({ user_id: '', type: 'sale', title: '', file: null });
       await fetchContracts();
     } finally {
       setSubmitting(false);
@@ -151,14 +187,32 @@ const AdminContractsPage = () => {
         </div>
         <form onSubmit={submitCreate} className="acd-form-grid">
           <div className="acd-field">
-            <label htmlFor="contract-national-id">الهوية الوطنية للمستخدم</label>
+            <label htmlFor="contract-user-search">بحث عن المستخدم</label>
             <input
-              id="contract-national-id"
-              placeholder="أدخل رقم الهوية"
-              value={form.national_id}
-              onChange={(e) => setForm((p) => ({ ...p, national_id: e.target.value }))}
-              required
+              id="contract-user-search"
+              placeholder="ابحث بالاسم أو الهوية"
+              value={userSearch}
+              onChange={(e) => setUserSearch(e.target.value)}
             />
+          </div>
+
+          <div className="acd-field">
+            <label htmlFor="contract-user-id">المستخدم</label>
+            <select
+              id="contract-user-id"
+              value={form.user_id}
+              onChange={(e) => setForm((p) => ({ ...p, user_id: e.target.value }))}
+              required
+            >
+              <option value="">
+                {usersLoading ? 'جاري تحميل المستخدمين...' : 'اختر المستخدم'}
+              </option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name || `User #${u.id}`} - {u.national_id || 'بدون هوية'}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="acd-field">

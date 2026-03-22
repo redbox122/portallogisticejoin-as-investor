@@ -5,11 +5,11 @@ import { API_BASE_URL } from '../../config';
 
 const STATUS_BADGE = {
   draft: 'مسودة',
-  sent: 'تم الإرسال',
-  nafath_pending: 'بانتظار نفاذ',
+  sent: 'قيد الإرسال',
+  nafath_pending: 'قيد التوثيق',
   nafath_approved: 'موثق عبر نفاذ',
-  admin_pending: '⏳ قيد المراجعة',
-  approved: '✅ مقبول',
+  admin_pending: 'قيد المراجعة',
+  approved: 'مكتمل',
   rejected: '❌ مرفوض',
 };
 
@@ -106,16 +106,12 @@ const ContractsWorkflowPage = () => {
                 </a>
               )}
 
-              {contract.status === 'sent' && (
-                <button onClick={() => verifyNafath(contract.id)} disabled={submittingId === contract.id}>
-                  {submittingId === contract.id ? 'جاري الإرسال...' : 'توثيق عبر نفاذ'}
-                </button>
-              )}
-              {contract.status === 'nafath_pending' && (
-                <button disabled>
-                  بانتظار الموافقة عبر نفاذ
-                </button>
-              )}
+              <button
+                onClick={() => verifyNafath(contract.id)}
+                disabled={contract.status !== 'sent' || submittingId === contract.id}
+              >
+                {submittingId === contract.id ? 'جاري الإرسال...' : 'توثيق عبر نفاذ'}
+              </button>
             </div>
 
             {nafathFeedback[contract.id]?.message && (

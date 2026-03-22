@@ -69,8 +69,8 @@ class ContractController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'user_id' => 'nullable|integer|exists:users,id',
-            'national_id' => 'nullable|string|max:32',
+            'user_id' => 'nullable|integer|exists:users,id|required_without:national_id',
+            'national_id' => 'nullable|string|max:32|required_without:user_id',
             'type' => 'required|in:sale,rental',
             'title' => 'required|string|max:255',
             'file' => 'nullable|file|mimes:pdf|max:15360',
@@ -87,6 +87,13 @@ class ContractController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Assigned user not found.',
+            ], 422);
+        }
+
+        if ($targetUser->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Contracts can be assigned to users only.',
             ], 422);
         }
 
