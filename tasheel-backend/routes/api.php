@@ -28,9 +28,31 @@ Route::get('/health', function () {
 
 Route::post('webhook/sadq', [SadqWebhookController::class, 'handle']);
 Route::post('test/nafath', [SadqTestController::class, 'nafath']);
-Route::post('contracts/send', [ContractController::class, 'send']);
-Route::get('contracts/status/{request_id}', [ContractController::class, 'status']);
-Route::post('contracts/mock-approve', [ContractController::class, 'mockApprove']);
+
+Route::middleware('auth.token')->group(function () {
+    // User + admin list; admin gets all, user gets own contracts.
+    Route::get('contracts', [ContractController::class, 'index']);
+    Route::get('contracts/{id}', [ContractController::class, 'show']);
+    Route::post('contracts/{id}/nafath', [ContractController::class, 'nafath']);
+
+    // Frontend compatibility aliases.
+    Route::get('portallogistice/contracts', [ContractController::class, 'index']);
+    Route::get('portallogistice/contracts/{id}', [ContractController::class, 'show']);
+    Route::post('portallogistice/contracts/{id}/nafath', [ContractController::class, 'nafath']);
+});
+
+Route::middleware(['auth.token', 'admin'])->group(function () {
+    Route::post('contracts', [ContractController::class, 'store']);
+    Route::post('contracts/{id}/send', [ContractController::class, 'send']);
+    Route::post('contracts/{id}/admin-approve', [ContractController::class, 'adminApprove']);
+    Route::post('contracts/{id}/reject', [ContractController::class, 'reject']);
+
+    // Frontend compatibility aliases.
+    Route::post('portallogistice/admin/contracts', [ContractController::class, 'store']);
+    Route::post('portallogistice/admin/contracts/{id}/send', [ContractController::class, 'send']);
+    Route::post('portallogistice/admin/contracts/{id}/admin-approve', [ContractController::class, 'adminApprove']);
+    Route::post('portallogistice/admin/contracts/{id}/reject', [ContractController::class, 'reject']);
+});
 
 /*
 |--------------------------------------------------------------------------

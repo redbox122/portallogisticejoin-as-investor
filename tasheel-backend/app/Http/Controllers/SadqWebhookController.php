@@ -50,14 +50,15 @@ class SadqWebhookController extends Controller
             ]);
         }
 
-        $contract = Contract::where('request_id', $requestId)->first();
+        $contract = Contract::where('nafath_reference', $requestId)->first();
         if ($contract) {
             if ($status === SadqNafathRequest::STATUS_APPROVED) {
-                $contract->update(['status' => 'approved']);
+                // Nafath step approved; contract now enters admin review queue.
+                $contract->update(['status' => Contract::STATUS_ADMIN_PENDING]);
             } elseif ($status === SadqNafathRequest::STATUS_REJECTED) {
-                $contract->update(['status' => 'rejected']);
+                $contract->update(['status' => Contract::STATUS_REJECTED]);
             } else {
-                $contract->update(['status' => 'pending']);
+                $contract->update(['status' => Contract::STATUS_NAFATH_PENDING]);
             }
         }
 

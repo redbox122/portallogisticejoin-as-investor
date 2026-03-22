@@ -38,7 +38,7 @@ import LoginPage from './Pages/LoginPage';
 import DashboardLayout from './Components/DashboardLayout';
 import OverviewPage from './Pages/Dashboard/OverviewPage';
 import AnalyticsPage from './Pages/Dashboard/AnalyticsPage';
-import ContractsPage from './Pages/Dashboard/ContractsPage';
+import ContractsWorkflowPage from './Pages/Dashboard/ContractsWorkflowPage';
 import PaymentsPage from './Pages/Dashboard/PaymentsPage';
 import ProfilePage from './Pages/Dashboard/ProfilePage';
 import TasksPage from './Pages/Dashboard/TasksPage';
@@ -97,7 +97,7 @@ root.render(
           >
             <Route index element={<OverviewPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="contracts" element={<ContractsPage />} />
+            <Route path="contracts" element={<ContractsWorkflowPage />} />
             <Route path="payments" element={<PaymentsRouteGuard><PaymentsPage /></PaymentsRouteGuard>} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<ProfilePage />} />
