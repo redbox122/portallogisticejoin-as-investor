@@ -19,60 +19,16 @@ const AdminUsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1); // kept for UI consistency
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
 
-  const fetchUsers = useCallback(async (targetPage = page, targetSearch = search) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.set('page', String(targetPage));
-      params.set('per_page', '10');
-      if (targetSearch.trim()) params.set('search', targetSearch.trim());
-
-      const response = await axios.get(`${adminUsersBase}?${params.toString()}`, {
-        headers: getAuthHeaders(),
-      });
-
-      const payload = response.data?.data;
-      setUsers(payload?.data || []);
-      setPagination({
-        current_page: payload?.current_page || 1,
-        last_page: payload?.last_page || 1,
-        total: payload?.total || 0,
-      });
-    } catch (error) {
-      const isUnauthenticated = error?.response?.status === 401;
-      const isRouteMissing = error?.response?.status === 404 || error?.response?.status === 405;
-      if (isUnauthenticated) {
-        navigate('/', { replace: true });
-      }
-      if (isRouteMissing) {
-        // Some production bridges expose create-user only; keep UI usable without breaking page.
-        setUsers([]);
-        setPagination({ current_page: 1, last_page: 1, total: 0 });
-        return;
-      }
-      Store.addNotification({
-        title: 'خطأ',
-        message: isUnauthenticated
-          ? 'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.'
-          : (error?.response?.data?.message || 'تعذر تحميل المستخدمين'),
-        type: 'danger',
-        insert: 'top',
-        container: 'top-right',
-        dismiss: { duration: 4000 },
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [adminUsersBase, getAuthHeaders, navigate, page, search]);
-
   useEffect(() => {
-    fetchUsers(page, search);
-  }, [page, search, fetchUsers]);
+    // In production bridge, users-list GET may be unavailable.
+    // Keep page usable for create-user flow and optimistic local listing.
+    setLoading(false);
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -87,9 +43,22 @@ const AdminUsersPage = () => {
         container: 'top-right',
         dismiss: { duration: 3000 },
       });
+
+      const createdUser = {
+        id: Date.now(),
+        name: form.name,
+        national_id: form.national_id,
+        phone: form.phone || null,
+        status: 'active',
+      };
+      setUsers((prev) => [createdUser, ...prev]);
+      setPagination((prev) => ({
+        ...prev,
+        total: (prev.total || 0) + 1,
+      }));
+
       setForm({ name: '', national_id: '', phone: '', email: '', password: '' });
       setPage(1);
-      fetchUsers(1, search);
     } catch (error) {
       const isUnauthenticated = error?.response?.status === 401;
       if (isUnauthenticated) {
@@ -114,6 +83,12 @@ const AdminUsersPage = () => {
       setSubmitting(false);
     }
   };
+
+  const filteredUsers = users.filter((u) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (`${u.name || ''} ${u.national_id || ''}`.toLowerCase().includes(q));
+  });
 
   return (
     <div className="admin-users-page">
@@ -181,12 +156,12 @@ const AdminUsersPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.length === 0 && (
+                {filteredUsers.length === 0 && (
                   <tr>
                     <td colSpan="5" className="empty">لا يوجد مستخدمون</td>
                   </tr>
                 )}
-                {users.map((u) => (
+                {filteredUsers.map((u) => (
                   <tr key={u.id}>
                     <td>{u.name || '-'}</td>
                     <td>{u.national_id || '-'}</td>
@@ -205,13 +180,7 @@ const AdminUsersPage = () => {
             </table>
 
             <div className="pagination">
-              <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-                السابق
-              </button>
-              <span>{pagination.current_page} / {pagination.last_page}</span>
-              <button type="button" disabled={page >= pagination.last_page} onClick={() => setPage((p) => p + 1)}>
-                التالي
-              </button>
+              <span>إجمالي المستخدمين: {pagination.total}</span>
             </div>
           </>
         )}

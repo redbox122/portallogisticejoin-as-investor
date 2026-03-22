@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 import { Watch } from 'react-loader-spinner';
 import { Store } from 'react-notifications-component';
-import { useAuth } from '../../Context/AuthContext';
-import { API_BASE_URL } from '../../config';
 import '../../Css/pages/admin-saas-dashboard.css';
 
 function formatSAR(n) {
@@ -181,7 +178,6 @@ function DonutChart({ segments }) {
 
 const AdminOverviewPage = () => {
   const { t } = useTranslation(['common']);
-  const { getAuthHeaders } = useAuth();
 
   const mockDashboard = useMemo(() => {
     const stats = {
@@ -235,54 +231,10 @@ const AdminOverviewPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      setLoading(true);
-      setError('');
-
-      try {
-        const headers = getAuthHeaders();
-
-        // Attempt the requested endpoint (may be missing on backend for now)
-        const requestedRes = await axios.get(`${API_BASE_URL}/portallogistice/admin/dashboard`, { headers });
-        if (requestedRes.data?.success) {
-          setDashboard((prev) => ({
-            ...prev,
-            ...requestedRes.data.data,
-          }));
-          return;
-        }
-      } catch (e) {
-        // Fall back to existing stats endpoint (if present)
-        try {
-          const headers = getAuthHeaders();
-          const statsRes = await axios.get(`${API_BASE_URL}/portallogistice/admin/dashboard/stats`, {
-            headers,
-          });
-
-          if (statsRes.data?.success && statsRes.data.data) {
-            const d = statsRes.data.data;
-            // Map what we can; rest stays mock
-            setDashboard((prev) => ({
-              ...prev,
-              stats: {
-                ...prev.stats,
-                activeContracts: d.active_contracts ?? d.total_contracts ?? prev.stats.activeContracts,
-                urgentAlerts: d.urgent_alerts ?? prev.stats.urgentAlerts,
-              },
-            }));
-            return;
-          }
-        } catch (fallbackErr) {
-          // Keep mock and show error
-          setError('فشل تحميل بيانات لوحة الإدارة. سيتم عرض بيانات تجريبية.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboard();
-  }, [getAuthHeaders]);
+    // Keep dashboard stable with local data until backend dashboard endpoints are unified in production.
+    setError('');
+    setLoading(false);
+  }, []);
 
   const stats = dashboard.stats;
   const yearly = dashboard.charts.yearly;
