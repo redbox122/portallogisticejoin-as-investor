@@ -7,8 +7,8 @@ use App\Models\User;
 use App\Services\SadqService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ContractController extends Controller
 {
@@ -143,18 +143,27 @@ class ContractController extends Controller
             ], 422);
         }
 
-        $nationalId = (string) ($contract->user?->national_id ?? '');
-        if ($nationalId === '') {
+        if ((string) ($contract->user?->national_id ?? '') === '') {
             return response()->json([
                 'success' => false,
                 'message' => 'User national ID is required for Nafath.',
             ], 422);
         }
 
-        $sadqType = $contract->type === Contract::TYPE_SALE ? 'selling' : 'rental';
-        $result = $this->sadqService->initiateNafath($nationalId, $sadqType);
+        Log::info('Contract Nafath request started', [
+            'contract_id' => $contract->id,
+            'user_id' => $contract->user_id,
+            'from_status' => $contract->status,
+        ]);
+
+        $result = $this->sadqService->initiateNafath($contract, $contract->type);
 
         if (! ($result['success'] ?? false)) {
+            Log::warning('Contract Nafath request failed', [
+                'contract_id' => $contract->id,
+                'response' => $result,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => $result['message'] ?? 'Nafath initiation failed.',
@@ -162,14 +171,19 @@ class ContractController extends Controller
             ], 422);
         }
 
-        $nafathReference = (string) ($result['request_id'] ?? Str::uuid()->toString());
-        $contract->update([
-            'status' => Contract::STATUS_NAFATH_PENDING,
-            'nafath_reference' => $nafathReference,
+        $contract->refresh();
+
+        Log::info('Contract Nafath request sent', [
+            'contract_id' => $contract->id,
+            'nafath_reference' => $contract->nafath_reference,
+            'new_status' => $contract->status,
+            'challenge_number' => $result['challenge_number'] ?? null,
         ]);
 
         return response()->json([
             'success' => true,
+            'message' => 'تم إرسال الطلب إلى تطبيق نفاذ 📱 يرجى فتح التطبيق واختيار الرقم للموافقة',
+            'challenge_number' => $result['challenge_number'] ?? null,
             'data' => $this->toApi($contract->fresh(['user', 'admin'])),
             'sadq' => $result,
         ]);

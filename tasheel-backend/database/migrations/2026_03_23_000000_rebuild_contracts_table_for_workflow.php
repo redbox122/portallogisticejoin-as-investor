@@ -25,7 +25,7 @@ return new class extends Migration
                 'approved',
                 'rejected',
             ])->default('draft');
-            $table->uuid('nafath_reference')->nullable()->unique();
+            $table->string('nafath_reference')->nullable()->unique();
             $table->foreignId('admin_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

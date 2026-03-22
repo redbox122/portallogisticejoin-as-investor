@@ -26,8 +26,37 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-Route::post('webhook/sadq', [SadqWebhookController::class, 'handle']);
+/*
+| Sadq webhooks — Sadq calls POST /api/sadq/webhook (see config services.sadq.webhook_url).
+| Keep legacy POST /api/webhook/sadq for backward compatibility.
+*/
+Route::post('/webhook/sadq', [SadqWebhookController::class, 'handle']);
+Route::post('/sadq/webhook', [SadqWebhookController::class, 'handle']);
+// Browser / health check: must not 404; POST is the real webhook.
+Route::get('/sadq/webhook', function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'Method Not Allowed. Use POST.',
+    ], 405);
+});
+
 Route::post('test/nafath', [SadqTestController::class, 'nafath']);
+Route::get('sadq/health-check', function () {
+    return response()->json([
+        'success' => true,
+        'source' => 'routes/api.php',
+        'route' => 'sadq/health-check',
+        'time' => now()->toIso8601String(),
+    ]);
+});
+Route::get('api/sadq/health-check', function () {
+    return response()->json([
+        'success' => true,
+        'source' => 'routes/api.php',
+        'route' => 'api/sadq/health-check',
+        'time' => now()->toIso8601String(),
+    ]);
+});
 
 Route::middleware('auth.token')->group(function () {
     // User + admin list; admin gets all, user gets own contracts.

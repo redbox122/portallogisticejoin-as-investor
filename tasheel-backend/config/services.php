@@ -35,25 +35,16 @@ return [
         ],
     ],
 
-    /*
-    | Sadq Tasheel — Integration Nafath (Hash Sign: thumbPrint + accountId headers only).
-    */
     'sadq' => [
-        'base_url' => rtrim(env('SADQ_BASE_URL', 'https://sandbox-api.sadq-sa.com'), '/'),
+        'base_url' => rtrim(env('SADQ_BASE_URL', 'https://api.sadq.sa'), '/'),
+        'api_key' => env('SADQ_API_KEY'),
         'account_id' => env('SADQ_ACCOUNT_ID'),
-        'account_secret' => env('SADQ_ACCOUNT_SECRET'),
-        'username' => env('SADQ_USERNAME'),
-        'password' => env('SADQ_PASSWORD'),
-        'grant_type' => env('SADQ_GRANT_TYPE', 'integration'),
-        'token_path' => env('SADQ_TOKEN_PATH', '/Authentication/Authority/Token'),
-        'add_webhook_path' => env('SADQ_ADD_WEBHOOK_PATH', '/IntegrationService/Configuration/webhook'),
-        'thumbprint' => env('SADQ_THUMBPRINT'),
-        'nafath_auth_path' => env('SADQ_NAFATH_AUTH_PATH', '/Authentication/Authority/IntegrationNafathAuth'),
-        'include_hash_headers' => filter_var(env('SADQ_INCLUDE_HASH_HEADERS', true), FILTER_VALIDATE_BOOL),
+        'webhook_url' => env('SADQ_WEBHOOK_URL', 'https://portallogisticejoin-as-investor.com/api/sadq/webhook'),
+        'webhook_secret' => env('SADQ_WEBHOOK_SECRET'),
+        'webhook_ip_whitelist' => env('SADQ_WEBHOOK_IP_WHITELIST', ''),
+        'nafath_initiate_path' => env('SADQ_NAFATH_INITIATE_PATH', '/nafath/initiate'),
         'timeout' => (int) env('SADQ_HTTP_TIMEOUT', 30),
         'verify_ssl' => filter_var(env('SADQ_VERIFY_SSL', true), FILTER_VALIDATE_BOOL),
-        'token_cache_ttl' => (int) env('SADQ_TOKEN_CACHE_TTL', 1800),
-        'webhook_register_ttl' => (int) env('SADQ_WEBHOOK_REGISTER_TTL', 86400),
     ],
 
 ];

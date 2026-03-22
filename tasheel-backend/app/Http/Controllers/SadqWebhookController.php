@@ -10,15 +10,35 @@ use Illuminate\Support\Facades\Log;
 
 class SadqWebhookController extends Controller
 {
-    /**
-     * Sadq callback: persist requestId + status (approved / rejected / pending).
-     */
     public function handle(Request $request): JsonResponse
     {
         $payload = $request->all();
+        $headers = $request->headers->all();
+        $sourceIp = (string) $request->ip();
+
+        Log::info('Sadq webhook received', [
+            'ip' => $sourceIp,
+            'headers' => $headers,
+            'payload' => $payload,
+        ]);
+
+        if (! $this->isAuthorizedWebhook($request)) {
+            Log::warning('Sadq webhook unauthorized source', ['ip' => $sourceIp]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized webhook source.',
+            ], 401);
+        }
 
         $requestId = $this->extractRequestId($payload);
         $status = $this->normalizeStatus($payload);
+
+        Log::info('Sadq webhook parsed', [
+            'request_id' => $requestId,
+            'status' => $status,
+            'raw_status' => data_get($payload, 'status', data_get($payload, 'Status')),
+        ]);
 
         if ($requestId === null || $requestId === '') {
             Log::warning('Sadq webhook: missing requestId', ['keys' => array_keys($payload)]);
@@ -52,19 +72,59 @@ class SadqWebhookController extends Controller
 
         $contract = Contract::where('nafath_reference', $requestId)->first();
         if ($contract) {
+            Log::info('Sadq webhook contract matched', [
+                'request_id' => $requestId,
+                'contract_id' => $contract->id,
+                'current_status' => $contract->status,
+            ]);
+
+            $fromStatus = $contract->status;
             if ($status === SadqNafathRequest::STATUS_APPROVED) {
-                // Nafath step approved; contract now enters admin review queue.
                 $contract->update(['status' => Contract::STATUS_ADMIN_PENDING]);
             } elseif ($status === SadqNafathRequest::STATUS_REJECTED) {
                 $contract->update(['status' => Contract::STATUS_REJECTED]);
             } else {
                 $contract->update(['status' => Contract::STATUS_NAFATH_PENDING]);
             }
+
+            $toStatus = $contract->fresh()->status;
+            Log::info('Sadq webhook contract status change', [
+                'request_id' => $requestId,
+                'contract_id' => $contract->id,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ]);
+        } else {
+            Log::warning('Sadq webhook contract not found for nafath_reference', [
+                'request_id' => $requestId,
+            ]);
         }
 
-        Log::info('Sadq webhook OK', ['request_id' => $requestId, 'status' => $status]);
+        Log::info('Sadq webhook processed', ['request_id' => $requestId, 'status' => $status]);
 
         return response()->json(['success' => true]);
+    }
+
+    protected function isAuthorizedWebhook(Request $request): bool
+    {
+        $allowedRaw = (string) config('services.sadq.webhook_ip_whitelist', '');
+        $allowedIps = array_values(array_filter(array_map('trim', explode(',', $allowedRaw))));
+        if ($allowedIps !== [] && ! in_array((string) $request->ip(), $allowedIps, true)) {
+            return false;
+        }
+
+        $secret = (string) config('services.sadq.webhook_secret', '');
+        if ($secret === '') {
+            return true;
+        }
+
+        $provided = (string) (
+            $request->header('X-Sadq-Webhook-Secret')
+            ?? $request->header('X-Webhook-Secret')
+            ?? ''
+        );
+
+        return $provided !== '' && hash_equals($secret, $provided);
     }
 
     /**
