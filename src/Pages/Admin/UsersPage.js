@@ -12,6 +12,7 @@ const AdminUsersPage = () => {
     national_id: '',
     phone: '',
     email: '',
+    password: '',
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -86,15 +87,18 @@ const AdminUsersPage = () => {
         container: 'top-right',
         dismiss: { duration: 3000 },
       });
-      setForm({ name: '', national_id: '', phone: '', email: '' });
+      setForm({ name: '', national_id: '', phone: '', email: '', password: '' });
       setPage(1);
       fetchUsers(1, search);
     } catch (error) {
       const isUnauthenticated = error?.response?.status === 401;
-      const validationNationalId = error?.response?.data?.errors?.national_id?.[0];
+      const validationErrors = error?.response?.data?.errors;
+      const firstValidationMessage = validationErrors
+        ? Object.values(validationErrors).flat().find(Boolean)
+        : null;
       const msg = isUnauthenticated
         ? 'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.'
-        : (validationNationalId || error?.response?.data?.message || 'حدث خطأ أثناء إنشاء المستخدم');
+        : (firstValidationMessage || error?.response?.data?.message || 'حدث خطأ أثناء إنشاء المستخدم');
       Store.addNotification({
         title: 'خطأ',
         message: msg,
@@ -128,6 +132,16 @@ const AdminUsersPage = () => {
           <div className="form-group">
             <label>البريد (اختياري)</label>
             <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
+          </div>
+          <div className="form-group">
+            <label>كلمة السر</label>
+            <input
+              type="password"
+              value={form.password}
+              minLength={6}
+              onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+              required
+            />
           </div>
           <button className="create-btn" type="submit" disabled={submitting}>
             {submitting ? 'جاري الإنشاء...' : 'إنشاء مستخدم'}

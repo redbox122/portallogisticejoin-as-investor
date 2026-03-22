@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -56,19 +55,32 @@ class UserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name', '')),
+            'national_id' => trim((string) $request->input('national_id', '')),
+            // Treat empty optional fields as null to avoid false unique conflicts on empty strings.
+            'phone' => ($request->has('phone') && trim((string) $request->input('phone')) !== '')
+                ? trim((string) $request->input('phone'))
+                : null,
+            'email' => ($request->has('email') && trim((string) $request->input('email')) !== '')
+                ? trim((string) $request->input('email'))
+                : null,
+        ]);
+
         $validated = $request->validate(
             [
                 'name' => 'required|string|max:255',
                 'national_id' => 'required|string|max:20|unique:users,national_id',
                 'phone' => 'nullable|string|max:20|unique:users,phone',
                 'email' => 'nullable|email|unique:users,email',
+                'password' => 'required|string|min:6|max:72',
             ],
             [
                 'national_id.unique' => 'رقم الهوية مستخدم مسبقًا',
             ]
         );
 
-        $password = Str::random(12);
+        $password = (string) $validated['password'];
         $name = trim((string) $validated['name']);
 
         $user = User::create([
@@ -81,8 +93,8 @@ class UserController extends Controller
             'password' => Hash::make($password),
             'role' => User::ROLE_USER,
             'status' => User::STATUS_ACTIVE,
-            'is_verified' => false,
-            'is_first_login' => true,
+            'is_verified' => true,
+            'is_first_login' => false,
         ]);
 
         return response()->json([
@@ -90,7 +102,7 @@ class UserController extends Controller
             'message' => 'تم إنشاء المستخدم بنجاح',
             'data' => [
                 'user' => $user->toApiArray(),
-                'generated_password' => $password,
+                'login_hint' => 'يمكن تسجيل الدخول باستخدام الهوية الوطنية أو الجوال أو البريد مع كلمة المرور.',
             ],
         ], 201);
     }
