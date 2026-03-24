@@ -20,8 +20,8 @@ const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   // Force same-origin API path to avoid env misconfiguration (e.g. posting to /admin/users).
-  const adminUsersBase = '/api/admin/users';
-  const legacyAdminUsersBase = '/api/portallogistice/admin/users';
+ const adminUsersBase = '/portallogistice/admin/users';
+ const legacyAdminUsersBase = '/api/portallogistice/admin/users';
 
   useEffect(() => {
     // In production bridge, users-list GET may be unavailable.
@@ -69,6 +69,7 @@ const AdminUsersPage = () => {
 
       setForm({ name: '', national_id: '', phone: '', email: '', password: '' });
     } catch (error) {
+    console.log(error);
       const isUnauthenticated = error?.response?.status === 401;
       if (isUnauthenticated) {
         navigate('/', { replace: true });
