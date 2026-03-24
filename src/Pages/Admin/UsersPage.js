@@ -4,6 +4,7 @@ import { Store } from 'react-notifications-component';
 import { useNavigate } from 'react-router-dom';
 import { getAuthHeaders } from '../../utils/api';
 import '../../Css/pages/admin-users-page.css';
+import { API_BASE_URL } from '../../config'
 
 const AdminUsersPage = () => {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   // Force same-origin API path to avoid env misconfiguration (e.g. posting to /admin/users).
- const adminUsersBase = '/api/portallogistice/admin/users';
- const legacyAdminUsersBase = '/api/admin/users';
+ const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
+const legacyAdminUsersBase=adminUsersBase;
   useEffect(() => {
     // In production bridge, users-list GET may be unavailable.
     // Keep page usable for create-user flow and optimistic local listing.
