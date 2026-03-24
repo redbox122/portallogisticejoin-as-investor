@@ -20,9 +20,8 @@ const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   // Force same-origin API path to avoid env misconfiguration (e.g. posting to /admin/users).
- const adminUsersBase = '/portallogistice/admin/users';
- const legacyAdminUsersBase = '/api/portallogistice/admin/users';
-
+ const adminUsersBase = '/api/portallogistice/admin/users';
+ const legacyAdminUsersBase = '/api/admin/users';
   useEffect(() => {
     // In production bridge, users-list GET may be unavailable.
     // Keep page usable for create-user flow and optimistic local listing.
