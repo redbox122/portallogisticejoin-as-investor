@@ -118,3 +118,19 @@ Route::prefix('portallogistice')->group(function () {
         Route::post('users', [AdminUserController::class, 'store']);
     });
 });
+
+Route::prefix('portallogistice')->middleware('auth.token')->group(function () {
+    Route::get('profile', function (Request $r) {
+        return response()->json(['success' => true, 'data' => ['user' => $r->user()->toApiArray()]]);
+    });
+    Route::put('profile', function (Request $r) {
+        $user = $r->user();
+        $validated = $r->validate([
+            'name' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|nullable|string|max:20|unique:users,phone,' . $user->id,
+            'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
+        ]);
+        $user->forceFill($validated)->save();
+        return response()->json(['success' => true, 'data' => ['user' => $user->toApiArray()]]);
+    });
+});

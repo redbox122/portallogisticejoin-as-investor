@@ -25,6 +25,7 @@ const AdminContractsPage = () => {
   const { getAuthHeaders } = useAuth();
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [tab, setTab] = useState('pending');
@@ -61,6 +62,7 @@ const AdminContractsPage = () => {
 
   const fetchContracts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/contracts`, {
         headers: getAuthHeaders(),
@@ -68,6 +70,7 @@ const AdminContractsPage = () => {
       setContracts(response.data?.data || []);
     } catch (e) {
       console.error('Failed to fetch contracts', e);
+      setError(e?.response?.data?.message || 'تعذر تحميل العقود. حاول مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -273,83 +276,163 @@ const AdminContractsPage = () => {
             <i className="fas fa-spinner fa-spin"></i>
             <p>جاري تحميل العقود...</p>
           </div>
+        ) : error ? (
+          <div className="acd-error-state">
+            <i className="fas fa-triangle-exclamation"></i>
+            <p>{error}</p>
+            <button className="acd-btn acd-btn-primary acd-retry-btn" type="button" onClick={fetchContracts}>
+              <i className="fas fa-rotate-right"></i>
+              إعادة المحاولة
+            </button>
+          </div>
         ) : (
-          <div className="acd-table-wrap">
-            <table className="acd-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>النوع</th>
-                  <th>العنوان</th>
-                  <th>الحالة</th>
-                  <th>PDF</th>
-                  <th>الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredContracts.length === 0 && (
+          <>
+            <div className="acd-table-desktop acd-table-wrap">
+              <table className="acd-table">
+                <thead>
                   <tr>
-                    <td colSpan="6" className="acd-empty-row">لا توجد عقود ضمن هذا التصنيف.</td>
+                    <th>#</th>
+                    <th>النوع</th>
+                    <th>العنوان</th>
+                    <th>الحالة</th>
+                    <th>PDF</th>
+                    <th>الإجراءات</th>
                   </tr>
-                )}
-                {filteredContracts.map((contract) => {
+                </thead>
+                <tbody>
+                  {filteredContracts.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="acd-empty-row">لا توجد عقود ضمن هذا التصنيف.</td>
+                    </tr>
+                  )}
+                  {filteredContracts.map((contract) => {
+                    const badge = STATUS_LABELS[contract.status] || { text: contract.status, icon: 'fa-circle-info', tone: 'draft' };
+                    const isBusy = actionLoadingId === contract.id;
+
+                    return (
+                      <tr key={contract.id}>
+                        <td className="acd-id-cell">#{contract.id}</td>
+                        <td>
+                          <span className={`acd-type-pill ${contract.type}`}>
+                            <i className={`fas ${contract.type === 'sale' ? 'fa-file-contract' : 'fa-file'}`}></i>
+                            {contract.type === 'sale' ? 'مبايعة' : 'استئجار'}
+                          </span>
+                        </td>
+                        <td className="acd-title-cell">{contract.title}</td>
+                        <td>
+                          <span className={`acd-status-badge ${badge.tone}`}>
+                            <i className={`fas ${badge.icon}`}></i>
+                            {badge.text}
+                          </span>
+                        </td>
+                        <td>
+                          {contract.file_url ? (
+                            <a className="acd-link-btn" href={contract.file_url} target="_blank" rel="noreferrer">
+                              <i className="fas fa-eye"></i>
+                              عرض PDF
+                            </a>
+                          ) : (
+                            <span className="acd-no-file">—</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="acd-actions">
+                            {contract.status === 'draft' && (
+                              <button className="acd-btn acd-btn-secondary" onClick={() => sendContract(contract.id)} disabled={isBusy}>
+                                <i className="fas fa-paper-plane"></i>
+                                {isBusy ? '...' : 'إرسال'}
+                              </button>
+                            )}
+                            {(contract.status === 'admin_pending' || contract.status === 'nafath_approved') && (
+                              <>
+                                <button className="acd-btn acd-btn-success" onClick={() => approveContract(contract.id)} disabled={isBusy}>
+                                  <i className="fas fa-check"></i>
+                                  {isBusy ? '...' : 'اعتماد'}
+                                </button>
+                                <button className="acd-btn acd-btn-danger" onClick={() => rejectContract(contract.id)} disabled={isBusy}>
+                                  <i className="fas fa-xmark"></i>
+                                  {isBusy ? '...' : 'رفض'}
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="acd-cards-mobile acd-cards-wrap">
+              {filteredContracts.length === 0 ? (
+                <div className="acd-empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>لا توجد عقود ضمن هذا التصنيف.</p>
+                </div>
+              ) : (
+                filteredContracts.map((contract) => {
                   const badge = STATUS_LABELS[contract.status] || { text: contract.status, icon: 'fa-circle-info', tone: 'draft' };
                   const isBusy = actionLoadingId === contract.id;
 
                   return (
-                    <tr key={contract.id}>
-                      <td className="acd-id-cell">#{contract.id}</td>
-                      <td>
+                    <div key={contract.id} className="acd-contract-card">
+                      <div className="acd-card-header-row">
+                        <div className="acd-card-title">
+                          <span className="acd-id-cell">#{contract.id}</span>
+                          <span className="acd-title-cell">{contract.title}</span>
+                        </div>
+
                         <span className={`acd-type-pill ${contract.type}`}>
                           <i className={`fas ${contract.type === 'sale' ? 'fa-file-contract' : 'fa-file'}`}></i>
                           {contract.type === 'sale' ? 'مبايعة' : 'استئجار'}
                         </span>
-                      </td>
-                      <td className="acd-title-cell">{contract.title}</td>
-                      <td>
+                      </div>
+
+                      <div className="acd-card-meta-row">
                         <span className={`acd-status-badge ${badge.tone}`}>
                           <i className={`fas ${badge.icon}`}></i>
                           {badge.text}
                         </span>
-                      </td>
-                      <td>
+                      </div>
+
+                      <div className="acd-card-links-row">
                         {contract.file_url ? (
                           <a className="acd-link-btn" href={contract.file_url} target="_blank" rel="noreferrer">
                             <i className="fas fa-eye"></i>
                             عرض PDF
                           </a>
                         ) : (
-                          <span className="acd-no-file">—</span>
+                          <span className="acd-no-file">لا يوجد ملف</span>
                         )}
-                      </td>
-                      <td>
-                        <div className="acd-actions">
-                          {contract.status === 'draft' && (
-                            <button className="acd-btn acd-btn-secondary" onClick={() => sendContract(contract.id)} disabled={isBusy}>
-                              <i className="fas fa-paper-plane"></i>
-                              {isBusy ? '...' : 'إرسال'}
+                      </div>
+
+                      <div className="acd-actions">
+                        {contract.status === 'draft' && (
+                          <button className="acd-btn acd-btn-secondary" onClick={() => sendContract(contract.id)} disabled={isBusy}>
+                            <i className="fas fa-paper-plane"></i>
+                            {isBusy ? '...' : 'إرسال'}
+                          </button>
+                        )}
+                        {(contract.status === 'admin_pending' || contract.status === 'nafath_approved') && (
+                          <>
+                            <button className="acd-btn acd-btn-success" onClick={() => approveContract(contract.id)} disabled={isBusy}>
+                              <i className="fas fa-check"></i>
+                              {isBusy ? '...' : 'اعتماد'}
                             </button>
-                          )}
-                          {(contract.status === 'admin_pending' || contract.status === 'nafath_approved') && (
-                            <>
-                              <button className="acd-btn acd-btn-success" onClick={() => approveContract(contract.id)} disabled={isBusy}>
-                                <i className="fas fa-check"></i>
-                                {isBusy ? '...' : 'اعتماد'}
-                              </button>
-                              <button className="acd-btn acd-btn-danger" onClick={() => rejectContract(contract.id)} disabled={isBusy}>
-                                <i className="fas fa-xmark"></i>
-                                {isBusy ? '...' : 'رفض'}
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                            <button className="acd-btn acd-btn-danger" onClick={() => rejectContract(contract.id)} disabled={isBusy}>
+                              <i className="fas fa-xmark"></i>
+                              {isBusy ? '...' : 'رفض'}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
+                })
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

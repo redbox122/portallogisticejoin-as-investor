@@ -226,6 +226,76 @@
   border-spacing: 0;
 }
 
+.acd-table-desktop {
+  display: block;
+}
+
+.acd-cards-mobile {
+  display: none;
+}
+
+.acd-cards-wrap {
+  display: grid;
+  gap: 12px;
+}
+
+.acd-contract-card {
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.acd-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.acd-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.acd-card-meta-row {
+  margin-top: 10px;
+}
+
+.acd-card-links-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.acd-empty-state {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.acd-error-state {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.acd-retry-btn {
+  margin-top: 4px;
+}
+
 .acd-table thead th {
   background: #f8fafc;
   color: #475569;
@@ -379,10 +449,33 @@
   }
 
   .acd-form-actions {
-    justify-content: stretch;
+    justify-content: center;
   }
 
   .acd-form-actions .acd-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .acd-card-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .acd-table-desktop {
+    display: none;
+  }
+
+  .acd-cards-mobile {
+    display: block;
+  }
+
+  .acd-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acd-actions .acd-btn {
     width: 100%;
     justify-content: center;
   }

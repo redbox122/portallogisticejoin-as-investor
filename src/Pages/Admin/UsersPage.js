@@ -23,11 +23,25 @@ const AdminUsersPage = () => {
   // Force same-origin API path to avoid env misconfiguration (e.g. posting to /admin/users).
  const adminUsersBase = `${API_BASE_URL}/portallogistice/admin/users`;
 const legacyAdminUsersBase=adminUsersBase;
-  useEffect(() => {
-    // In production bridge, users-list GET may be unavailable.
-    // Keep page usable for create-user flow and optimistic local listing.
-    setLoading(false);
-  }, []);
+useEffect(() => {
+  setLoading(true);
+  axios.get(`${API_BASE_URL}/portallogistice/admin/users`, {
+    headers: getAuthHeaders(),
+    params: { per_page: 15, page: pagination.current_page, search }
+  })
+  .then(res => {
+    setUsers(res.data.data.data);
+    setPagination({
+      current_page: res.data.data.current_page,
+      last_page: res.data.data.last_page,
+      total: res.data.data.total,
+    });
+  })
+  .catch(err => {
+    if (err?.response?.status === 401) navigate('/', { replace: true });
+  })
+  .finally(() => setLoading(false));
+}, [pagination.current_page, search]);
 
   const submit = async (e) => {
     e.preventDefault();

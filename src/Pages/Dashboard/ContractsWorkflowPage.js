@@ -17,11 +17,13 @@ const ContractsWorkflowPage = () => {
   const { getAuthHeaders } = useAuth();
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [submittingId, setSubmittingId] = useState(null);
   const [nafathFeedback, setNafathFeedback] = useState({});
 
   const loadContracts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/contracts`, {
         headers: getAuthHeaders(),
@@ -29,6 +31,7 @@ const ContractsWorkflowPage = () => {
       setContracts(response.data?.data || []);
     } catch (error) {
       console.error('Failed to load contracts', error);
+      setError(error?.response?.data?.message || 'تعذر تحميل العقود. حاول مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -71,70 +74,122 @@ const ContractsWorkflowPage = () => {
     }
   };
 
-  if (loading) return <div style={{ padding: 20 }}>Loading contracts...</div>;
+  const getStatusMeta = (status) => {
+    const metaByTone = {
+      draft: { tone: 'draft', icon: 'fa-file-lines' },
+      sent: { tone: 'sent', icon: 'fa-paper-plane' },
+      nafath_pending: { tone: 'nafath-pending', icon: 'fa-shield-halved' },
+      nafath_approved: { tone: 'nafath-approved', icon: 'fa-badge-check' },
+      admin_pending: { tone: 'admin-pending', icon: 'fa-clock' },
+      approved: { tone: 'approved', icon: 'fa-circle-check' },
+      rejected: { tone: 'rejected', icon: 'fa-circle-xmark' },
+    };
+
+    const label = STATUS_BADGE[status] || status;
+    const meta = metaByTone[status] || { tone: 'neutral', icon: 'fa-circle-info' };
+    return { label, ...meta };
+  };
+
+  if (loading) {
+    return (
+      <div className="contracts-workflow-loading">
+        <i className="fas fa-spinner fa-spin"></i>
+        <span>جاري تحميل العقود...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="contracts-workflow-error">
+        <i className="fas fa-triangle-exclamation"></i>
+        <p>{error}</p>
+        <button className="contracts-workflow-btn contracts-workflow-btn-primary" type="button" onClick={loadContracts}>
+          <i className="fas fa-rotate-right"></i>
+          إعادة المحاولة
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>عقودي</h2>
-      <div style={{ display: 'grid', gap: 12 }}>
-        {contracts.map((contract) => (
-          <div
-            key={contract.id}
-            style={{
-              border: '1px solid #e5e7eb',
-              borderRadius: 10,
-              padding: 14,
-              display: 'grid',
-              gap: 8,
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-              <strong>{contract.title}</strong>
-              <span>{contract.type === 'sale' ? 'عقد مبايعة' : 'عقد استئجار'}</span>
-            </div>
+    <div className="contracts-workflow-page">
+      <div className="contracts-workflow-header">
+        <div>
+          <h2 className="contracts-workflow-title">عقودي</h2>
+          <p className="contracts-workflow-subtitle">متابعة حالة العقود بدءًا من الإرسال حتى التوثيق عبر نفاذ.</p>
+        </div>
+      </div>
 
-            <div>
-              <span style={{ background: '#f3f4f6', borderRadius: 8, padding: '4px 8px' }}>
-                {STATUS_BADGE[contract.status] || contract.status}
-              </span>
-            </div>
+      {contracts.length === 0 ? (
+        <div className="contracts-workflow-empty">
+          <i className="fas fa-file-contract"></i>
+          <h3>لا توجد عقود</h3>
+          <p>سيظهر عقدك هنا بعد إنشائه.</p>
+        </div>
+      ) : (
+        <div className="contracts-workflow-list">
+          {contracts.map((contract) => {
+            const meta = getStatusMeta(contract.status);
+            const isBusy = submittingId === contract.id;
+            const canVerify = contract.status === 'sent';
 
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {contract.file_url && (
-                <a href={contract.file_url} target="_blank" rel="noreferrer">
-                  عرض PDF
-                </a>
-              )}
+            return (
+              <div key={contract.id} className="contracts-workflow-card">
+                <div className="contracts-workflow-top">
+                  <div className="contracts-workflow-heading">
+                    <span className="contracts-workflow-contract-id">#{contract.id}</span>
+                    <strong className="contracts-workflow-contract-title">{contract.title}</strong>
+                  </div>
 
-              <button
-                onClick={() => verifyNafath(contract.id)}
-                disabled={contract.status !== 'sent' || submittingId === contract.id}
-              >
-                {submittingId === contract.id ? 'جاري الإرسال...' : 'توثيق عبر نفاذ'}
-              </button>
-            </div>
+                  <div className="contracts-workflow-type">
+                    {contract.type === 'sale' ? 'عقد مبايعة' : 'عقد استئجار'}
+                  </div>
+                </div>
 
-            {nafathFeedback[contract.id]?.message && (
-              <div style={{
-                background: nafathFeedback[contract.id].ok ? '#eff6ff' : '#fef2f2',
-                border: `1px solid ${nafathFeedback[contract.id].ok ? '#bfdbfe' : '#fecaca'}`,
-                color: nafathFeedback[contract.id].ok ? '#1e3a8a' : '#991b1b',
-                borderRadius: 8,
-                padding: '10px 12px',
-                fontSize: 13,
-                lineHeight: 1.6,
-              }}>
-                <div>{nafathFeedback[contract.id].message}</div>
-                {nafathFeedback[contract.id].challengeNumber && (
-                  <div style={{ marginTop: 6, fontWeight: 700 }}>
-                    رقم التحدي: {nafathFeedback[contract.id].challengeNumber}
+                <div className="contracts-workflow-badges-row">
+                  <span className={`contracts-workflow-status contracts-workflow-status-${meta.tone}`}>
+                    <i className={`fas ${meta.icon}`}></i>
+                    {meta.label}
+                  </span>
+                </div>
+
+                <div className="contracts-workflow-actions-row">
+                  {contract.file_url ? (
+                    <a className="contracts-workflow-link" href={contract.file_url} target="_blank" rel="noreferrer">
+                      <i className="fas fa-eye"></i>
+                      عرض PDF
+                    </a>
+                  ) : (
+                    <span className="contracts-workflow-no-file">—</span>
+                  )}
+
+                  <button
+                    className="contracts-workflow-btn"
+                    onClick={() => verifyNafath(contract.id)}
+                    disabled={!canVerify || isBusy}
+                    type="button"
+                  >
+                    <i className="fas fa-shield-halved"></i>
+                    {isBusy ? 'جاري الإرسال...' : 'توثيق عبر نفاذ'}
+                  </button>
+                </div>
+
+                {nafathFeedback[contract.id]?.message && (
+                  <div className={`contracts-workflow-feedback ${nafathFeedback[contract.id].ok ? 'ok' : 'error'}`}>
+                    <div className="contracts-workflow-feedback-message">{nafathFeedback[contract.id].message}</div>
+                    {nafathFeedback[contract.id].challengeNumber && (
+                      <div className="contracts-workflow-feedback-challenge">
+                        رقم التحدي: {nafathFeedback[contract.id].challengeNumber}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
