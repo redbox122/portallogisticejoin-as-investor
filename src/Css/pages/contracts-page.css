@@ -579,6 +579,114 @@
   padding: 0 0;
 }
 
+.contracts-workflow-page--with-guide .contracts-workflow-loading,
+.contracts-workflow-page--with-guide .contracts-workflow-error {
+  min-height: 140px;
+}
+
+.contracts-workflow-guide {
+  margin: 0 0 16px;
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  box-shadow: 0 1px 3px rgba(7, 52, 145, 0.08);
+}
+
+.contracts-workflow-guide--compact {
+  margin-bottom: 12px;
+}
+
+.contracts-workflow-guide-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  flex-wrap: wrap;
+}
+
+.contracts-workflow-guide-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b91c1c;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.contracts-workflow-guide-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contracts-workflow-guide-text strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.contracts-workflow-guide-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.contracts-workflow-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #073491 0%, #1e4fad 100%);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(7, 52, 145, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.contracts-workflow-guide-btn:hover {
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(7, 52, 145, 0.35);
+}
+
+.contracts-workflow-guide-btn:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.contracts-workflow-guide--compact .contracts-workflow-guide-inner {
+  padding: 10px 12px;
+}
+
+.contracts-workflow-guide--compact .contracts-workflow-guide-icon {
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+}
+
+.contracts-workflow-guide--compact .contracts-workflow-guide-text strong {
+  font-size: 14px;
+}
+
+.contracts-workflow-guide--compact .contracts-workflow-guide-btn {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
 .contracts-workflow-header {
   display: flex;
   justify-content: space-between;
@@ -825,6 +933,16 @@
 }
 
 @media (max-width: 768px) {
+  .contracts-workflow-guide-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contracts-workflow-guide-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .contracts-workflow-header {
     margin-bottom: 12px;
   }

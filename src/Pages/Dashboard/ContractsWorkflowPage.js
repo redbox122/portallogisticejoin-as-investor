@@ -2,6 +2,39 @@ import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
+const CONTRACTORS_GUIDE_PDF_HREF ='https://portallogisticejoin-as-investor.com/storage/contractor-info.pdf'
+
+const ContractsWorkflowGuideBanner = ({ compact }) => (
+  
+  <div
+    className={`contracts-workflow-guide${compact ? ' contracts-workflow-guide--compact' : ''}`}
+    role="region"
+    aria-label="دليل معلومات المتعاقدين"
+  >
+    <div className="contracts-workflow-guide-inner">
+      <span className="contracts-workflow-guide-icon" aria-hidden="true">
+        <i className="fas fa-file-pdf"></i>
+      </span>
+      <div className="contracts-workflow-guide-text">
+        <strong>معلومات المتعاقدين</strong>
+        {!compact && (
+          <span className="contracts-workflow-guide-desc">
+            اطّلع على الدليل التعريفي قبل أو أثناء متابعة عقودك.
+          </span>
+        )}
+      </div>
+      <a
+        className="contracts-workflow-guide-btn"
+        href={CONTRACTORS_GUIDE_PDF_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span>فتح الدليل (PDF)</span>
+        <i className="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+);
 
 const STATUS_BADGE = {
   draft: 'مسودة',
@@ -92,28 +125,35 @@ const ContractsWorkflowPage = () => {
 
   if (loading) {
     return (
-      <div className="contracts-workflow-loading">
-        <i className="fas fa-spinner fa-spin"></i>
-        <span>جاري تحميل العقود...</span>
+      <div className="contracts-workflow-page contracts-workflow-page--with-guide">
+        <ContractsWorkflowGuideBanner compact />
+        <div className="contracts-workflow-loading">
+          <i className="fas fa-spinner fa-spin"></i>
+          <span>جاري تحميل العقود...</span>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="contracts-workflow-error">
-        <i className="fas fa-triangle-exclamation"></i>
-        <p>{error}</p>
-        <button className="contracts-workflow-btn contracts-workflow-btn-primary" type="button" onClick={loadContracts}>
-          <i className="fas fa-rotate-right"></i>
-          إعادة المحاولة
-        </button>
+      <div className="contracts-workflow-page contracts-workflow-page--with-guide">
+        <ContractsWorkflowGuideBanner compact />
+        <div className="contracts-workflow-error">
+          <i className="fas fa-triangle-exclamation"></i>
+          <p>{error}</p>
+          <button className="contracts-workflow-btn contracts-workflow-btn-primary" type="button" onClick={loadContracts}>
+            <i className="fas fa-rotate-right"></i>
+            إعادة المحاولة
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="contracts-workflow-page">
+      <ContractsWorkflowGuideBanner />
       <div className="contracts-workflow-header">
         <div>
           <h2 className="contracts-workflow-title">عقودي</h2>
