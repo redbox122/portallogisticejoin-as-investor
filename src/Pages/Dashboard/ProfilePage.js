@@ -98,6 +98,12 @@ const ProfilePage = () => {
   }
 
   const lastName = profile?.family_name ?? profile?.last_name;
+  const fatherName = profile?.father_name ?? '—';
+  const grandfatherName = profile?.grandfather_name ?? '—';
+  const birthDate = profile?.birth_date ?? '—';
+  const iban = profile?.iban ?? '—';
+  const bankName = profile?.bank_name ?? '—';
+  const region = profile?.region ?? '—';
   const fullName = profile?.full_name || [profile?.first_name, lastName].filter(Boolean).join(' ').trim() || '—';
   const email = profile?.email ?? '—';
   const phone = profile?.phone ?? profile?.phone_number ?? '—';
@@ -157,6 +163,30 @@ const ProfilePage = () => {
               <div className="profile-readonly-item">
                 <span className="profile-readonly-label">{t('national_id')}</span>
                 <span className="profile-readonly-value">{nationalId}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'اسم الأب' : 'Father Name'}</span>
+                <span className="profile-readonly-value">{fatherName}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'اسم الجد' : 'Grandfather Name'}</span>
+                <span className="profile-readonly-value">{grandfatherName}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'تاريخ الميلاد' : 'Birth Date'}</span>
+                <span className="profile-readonly-value">{birthDate}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'المنطقة' : 'Region'}</span>
+                <span className="profile-readonly-value">{region}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'رقم الآيبان' : 'IBAN'}</span>
+                <span className="profile-readonly-value">{iban}</span>
+              </div>
+              <div className="profile-readonly-item">
+                <span className="profile-readonly-label">{isRTL ? 'اسم البنك' : 'Bank Name'}</span>
+                <span className="profile-readonly-value">{bankName}</span>
               </div>
               <div className="profile-readonly-item">
                 <span className="profile-readonly-label">{i18n.language === 'ar' ? 'الدور' : 'Role'}</span>
