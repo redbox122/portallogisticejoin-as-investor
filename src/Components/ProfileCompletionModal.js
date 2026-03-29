@@ -554,7 +554,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                 {i18n.language === 'ar' ? 'حفظ البيانات وإكمال لاحقاً' : 'Save draft & continue later'}
               </button>
 
-              <button type="submit" className="submit-btn primary-btn" disabled={loading}>
+              <button onClick={handleSubmit} type="submit" className="submit-btn primary-btn" disabled={loading}>
                 {loading ? (
                   <>
                     <Watch height="20" width="20" color="#fff" ariaLabel="loading" />
