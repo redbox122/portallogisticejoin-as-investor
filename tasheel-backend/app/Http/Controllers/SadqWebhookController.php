@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\SadqNafathRequest;
+use App\Services\SadqService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SadqWebhookController extends Controller
 {
+    // 1. Inject the SadqService here
+    public function __construct(
+        protected SadqService $sadqService
+    ) {}
+
     public function handle(Request $request): JsonResponse
     {
         $payload = $request->all();
@@ -79,13 +86,50 @@ class SadqWebhookController extends Controller
             ]);
 
             $fromStatus = $contract->status;
+
+            // ==========================================
+            // PHASE 4: AUTO-SIGN WORKFLOW
+            // ==========================================
             if ($status === SadqNafathRequest::STATUS_APPROVED) {
-                $contract->update(['status' => Contract::STATUS_ADMIN_PENDING]);
+                
+                // 1. Tell the database the user is verified
+                $contract->update(['status' => 'nafath_approved']);
+
+                try {
+                    Log::info('Phase 4: Starting Auto-Sign', ['contract_id' => $contract->id]);
+
+                    // Get the full path to the PDF file on your server
+                    $filePath = storage_path('app/public/' . $contract->file_path);
+                    $fileName = basename($contract->file_path);
+
+                    // Call the sign function from your Service
+                    $signResult = $this->sadqService->signDocument($requestId, $filePath, $fileName);
+
+                    if ($signResult['success'] && !empty($signResult['signed_base64'])) {
+                        // Decode the Base64 PDF sent back by Sadq
+                        $decodedPdf = base64_decode($signResult['signed_base64']);
+
+                        // Overwrite the old file with the new SIGNED file
+                        Storage::disk('public')->put($contract->file_path, $decodedPdf);
+
+                        Log::info('Phase 4: Document signed and saved successfully');
+
+                        // Move to Admin Pending only AFTER signing is successful
+                        $contract->update(['status' => 'admin_pending']);
+                    } else {
+                        Log::error('Phase 4: Sign failed', ['message' => $signResult['message'] ?? 'Unknown Error']);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Phase 4: Exception during signing', ['error' => $e->getMessage()]);
+                }
+
             } elseif ($status === SadqNafathRequest::STATUS_REJECTED) {
-                $contract->update(['status' => Contract::STATUS_REJECTED]);
+                // FIX: Don't set to rejected, set to 'sent' so they can try again
+                $contract->update(['status' => 'sent']);
             } else {
-                $contract->update(['status' => Contract::STATUS_NAFATH_PENDING]);
+                $contract->update(['status' => 'nafath_pending']);
             }
+            // ==========================================
 
             $toStatus = $contract->fresh()->status;
             Log::info('Sadq webhook contract status change', [
