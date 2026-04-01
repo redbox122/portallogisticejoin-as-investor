@@ -1,8 +1,28 @@
+
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
-const CONTRACTORS_GUIDE_PDF_HREF ='https://portallogisticejoin-as-investor.com/storage/contractor-info.pdf'
+import PaymentReceiptUploadModal from '../../Components/PaymentReceiptUploadModal';
+
+const CONTRACTORS_GUIDE_PDF_HREF = 'https://portallogisticejoin-as-investor.com/storage/contractor-info.pdf';
+
+function nafathErrorMessage(error) {
+  const status = error?.response?.status;
+  const data = error?.response?.data;
+  const raw = typeof data?.message === 'string' ? data.message : '';
+
+  if (status === 503 || /Sadq config missing/i.test(raw)) {
+    return 'خدمة التوثيق عبر نفاذ غير مهيأة على هذا الخادم. للتطوير المحلي أضف SADQ_API_KEY وSADQ_ACCOUNT_ID (وSADQ_WEBHOOK_URL عند الحاجة) في ملف .env للخادم. للمستثمرين: يرجى التواصل مع الدعم إذا استمرت المشكلة.';
+  }
+  if (/Sadq API unreachable/i.test(raw) || status === 502 || status === 504) {
+    return 'تعذر الاتصال بخدمة التوثيق. حاول مرة أخرى بعد قليل.';
+  }
+  if (raw) {
+    return raw;
+  }
+  return 'تعذر إرسال الطلب إلى نفاذ. حاول مرة أخرى.';
+}
 
 const ContractsWorkflowGuideBanner = ({ compact }) => (
   
@@ -53,6 +73,9 @@ const ContractsWorkflowPage = () => {
   const [error, setError] = useState(null);
   const [submittingId, setSubmittingId] = useState(null);
   const [nafathFeedback, setNafathFeedback] = useState({});
+  const [receiptModal, setReceiptModal] = useState({ open: false, contractId: null });
+  const [receiptSaving, setReceiptSaving] = useState(false);
+  const [receiptError, setReceiptError] = useState('');
 
   const loadContracts = useCallback(async () => {
     setLoading(true);
@@ -93,17 +116,69 @@ const ContractsWorkflowPage = () => {
 
       await loadContracts();
     } catch (error) {
-      console.error('Nafath verification failed', error);
+      const status = error?.response?.status;
+      const dataMsg = error?.response?.data?.message;
+      const isExpectedConfig = status === 503 || /Sadq config missing/i.test(String(dataMsg || ''));
+      if (!isExpectedConfig) {
+        console.error('Nafath verification failed', error);
+      }
       setNafathFeedback((prev) => ({
         ...prev,
         [contractId]: {
           ok: false,
-          message: error?.response?.data?.message || 'تعذر إرسال الطلب إلى نفاذ. حاول مرة أخرى.',
+          message: nafathErrorMessage(error),
           challengeNumber: null,
         },
       }));
     } finally {
       setSubmittingId(null);
+    }
+  };
+
+  const openReceiptModal = (contractId) => {
+    setReceiptError('');
+    setReceiptModal({ open: true, contractId });
+  };
+
+  const closeReceiptModal = () => {
+    if (receiptSaving) return;
+    setReceiptModal({ open: false, contractId: null });
+    setReceiptError('');
+  };
+
+  const savePaymentReceipt = async (file) => {
+    if (!receiptModal.contractId) return;
+    if (!file) {
+      setReceiptError('يرجى اختيار ملف الإيصال أولاً.');
+      return;
+    }
+
+    setReceiptSaving(true);
+    setReceiptError('');
+    try {
+      const form = new FormData();
+      form.append('payment_receipt', file);
+
+      await axios.post(
+        `${API_BASE_URL}/portallogistice/contracts/${receiptModal.contractId}/payment-receipt`,
+        form,
+        {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        }
+      );
+
+      closeReceiptModal();
+      await loadContracts();
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        (e?.response?.status === 422 ? 'تأكد من نوع الملف وحجمه (حتى 10MB).' : null) ||
+        'تعذر رفع الإيصال. حاول مرة أخرى.';
+      setReceiptError(msg);
+    } finally {
+      setReceiptSaving(false);
     }
   };
 
@@ -154,6 +229,14 @@ const ContractsWorkflowPage = () => {
   return (
     <div className="contracts-workflow-page">
       <ContractsWorkflowGuideBanner />
+      <PaymentReceiptUploadModal
+        isOpen={receiptModal.open}
+        onClose={closeReceiptModal}
+        onSave={savePaymentReceipt}
+        isSaving={receiptSaving}
+        error={receiptError}
+        contractId={receiptModal.contractId}
+      />
       <div className="contracts-workflow-header">
         <div>
           <h2 className="contracts-workflow-title">عقودي</h2>
@@ -173,6 +256,7 @@ const ContractsWorkflowPage = () => {
             const meta = getStatusMeta(contract.status);
             const isBusy = submittingId === contract.id;
             const canVerify = contract.status === 'sent';
+            const canUploadReceipt = contract.status === 'approved' && !contract.payment_receipt_path;
 
             return (
               <div key={contract.id} className="contracts-workflow-card">
@@ -203,6 +287,24 @@ const ContractsWorkflowPage = () => {
                   ) : (
                     <span className="contracts-workflow-no-file">—</span>
                   )}
+
+                  {contract.payment_receipt_url ? (
+                    <a className="contracts-workflow-link" href={contract.payment_receipt_url} target="_blank" rel="noreferrer">
+                      <i className="fas fa-receipt"></i>
+                      عرض الإيصال
+                    </a>
+                  ) : null}
+
+                  {canUploadReceipt ? (
+                    <button
+                      className="contracts-workflow-btn contracts-workflow-btn-secondary"
+                      type="button"
+                      onClick={() => openReceiptModal(contract.id)}
+                    >
+                      <i className="fas fa-cloud-arrow-up"></i>
+                      رفع إيصال الدفع
+                    </button>
+                  ) : null}
 
                   <button
                     className="contracts-workflow-btn"

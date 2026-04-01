@@ -897,6 +897,15 @@
   transform: none;
 }
 
+.contracts-workflow-btn-secondary {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.contracts-workflow-btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 .contracts-workflow-btn-primary {
   background: linear-gradient(135deg, #073491 0%, #1e4fad 100%);
 }
