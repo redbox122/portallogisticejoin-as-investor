@@ -337,6 +337,15 @@ const AdminContractsPage = () => {
                         </td>
                         <td>
                           <div className="acd-actions">
+                            {contract.payment_receipt_url ? (
+                              <a className="acd-link-btn" href={contract.payment_receipt_url} target="_blank" rel="noreferrer">
+                                <i className="fas fa-receipt"></i>
+                                عرض الإيصال
+                              </a>
+                            ) : null}
+
+                        
+
                             {contract.status === 'draft' && (
                               <button className="acd-btn acd-btn-secondary" onClick={() => sendContract(contract.id)} disabled={isBusy}>
                                 <i className="fas fa-paper-plane"></i>
@@ -405,6 +414,13 @@ const AdminContractsPage = () => {
                         ) : (
                           <span className="acd-no-file">لا يوجد ملف</span>
                         )}
+
+                        {contract.payment_receipt_url ? (
+                          <a className="acd-link-btn" href={contract.payment_receipt_url} target="_blank" rel="noreferrer">
+                            <i className="fas fa-receipt"></i>
+                            عرض الإيصال
+                          </a>
+                        ) : null}
                       </div>
 
                       <div className="acd-actions">
