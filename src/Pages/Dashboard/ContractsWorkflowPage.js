@@ -160,7 +160,7 @@ const ContractsWorkflowPage = () => {
       form.append('payment_receipt', file);
 
       await axios.post(
-        `${API_BASE_URL}/portallogistice/contracts/${receiptModal.contractId}/payment-receipt`,
+        `${API_BASE_URL}/contracts/${receiptModal.contractId}/payment-receipt`,
         form,
         {
           headers: {
