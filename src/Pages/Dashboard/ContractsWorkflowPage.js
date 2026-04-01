@@ -146,29 +146,27 @@ const ContractsWorkflowPage = () => {
     setReceiptError('');
   };
 
-  const savePaymentReceipt = async (file) => {
+const savePaymentReceipt = async (file) => {
     if (!receiptModal.contractId) return;
     if (!file) {
       setReceiptError('يرجى اختيار ملف الإيصال أولاً.');
       return;
     }
-
     setReceiptSaving(true);
     setReceiptError('');
     try {
       const form = new FormData();
       form.append('payment_receipt', file);
-
+      
+      // Get auth headers but remove Content-Type so axios sets multipart boundary automatically
+      const headers = getAuthHeaders();
+      delete headers['Content-Type'];
+      
       await axios.post(
         `${API_BASE_URL}/contracts/${receiptModal.contractId}/payment-receipt`,
         form,
-        {
-          headers: {
-            ...getAuthHeaders(),
-          },
-        }
+        { headers }
       );
-
       closeReceiptModal();
       await loadContracts();
     } catch (e) {
@@ -180,7 +178,7 @@ const ContractsWorkflowPage = () => {
     } finally {
       setReceiptSaving(false);
     }
-  };
+};
 
   const getStatusMeta = (status) => {
     const metaByTone = {
