@@ -52,15 +52,12 @@ const NotificationsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [grouped, setGrouped] = useState(null);
-  const [filter, setFilter] = useState('all'); // all, unread, urgent, completed, dismissed
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [summary, setSummary] = useState({ unread_count: 0, urgent_count: 0 });
+  const [filter, setFilter] = useState('all'); // all | unread
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [groupBy, setGroupBy] = useState(''); // type|date|priority|''
+  const [groupBy, setGroupBy] = useState(''); // reserved (no-op for now)
 
   useEffect(() => {
     // Light debounce for search/group changes
@@ -69,24 +66,14 @@ const NotificationsPage = () => {
     }, search ? 350 : 0);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, currentPage, search, groupBy]);
+  }, [filter, search, groupBy]);
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       const headers = getAuthHeaders();
-      const params = {
-        page: currentPage,
-        per_page: 20
-      };
-
-      if (filter === 'unread') {
-        params.read = 'false';
-      } else if (filter === 'urgent') {
-        params.priority = 'urgent';
-      } else if (filter !== 'all') {
-        params.status = filter;
-      }
+      const params = { per_page: 50 };
+      if (filter === 'unread') params.read = 'false';
 
       if (search && search.trim()) {
         params.search = search.trim();
@@ -101,12 +88,13 @@ const NotificationsPage = () => {
       );
 
       if (response.data?.success) {
-        setNotifications(response.data.data.notifications || []);
-        setSummary(response.data.data.summary);
-        setGrouped(response.data.data.grouped || null);
-        if (response.data.data.pagination) {
-          setTotalPages(response.data.data.pagination.total_pages || 1);
-        }
+        const items = response.data?.data?.notifications || response.data?.data || [];
+        const list = Array.isArray(items) ? items : [];
+        setNotifications(list);
+        setSummary({
+          unread_count: list.filter((n) => !n.is_read).length,
+          urgent_count: 0,
+        });
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -131,7 +119,8 @@ const NotificationsPage = () => {
         {},
         { headers }
       );
-      fetchNotifications();
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+      setSummary((s) => ({ ...s, unread_count: Math.max(0, (s?.unread_count || 0) - 1) }));
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.marked_read'),
@@ -153,7 +142,8 @@ const NotificationsPage = () => {
         {},
         { headers }
       );
-      fetchNotifications();
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setSummary((s) => ({ ...s, unread_count: 0 }));
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.all_marked_read'),
@@ -175,7 +165,6 @@ const NotificationsPage = () => {
         {},
         { headers }
       );
-      fetchNotifications();
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.completed'),
@@ -197,7 +186,6 @@ const NotificationsPage = () => {
         {},
         { headers }
       );
-      fetchNotifications();
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.dismissed'),
@@ -212,7 +200,7 @@ const NotificationsPage = () => {
   };
 
   const handleNotificationClick = (notification) => {
-    if (!notification.read_at) {
+    if (!notification.is_read) {
       handleMarkAsRead(notification.id);
     }
     if (notification.action_url) {
@@ -258,7 +246,7 @@ const NotificationsPage = () => {
     );
 
   const getDescription = (n) =>
-    pickFieldText(lang, n, ['description_ar', 'description'], ['description_en', 'description'], '');
+    pickFieldText(lang, n, ['body_ar', 'body'], ['body_en', 'body'], '');
 
   const getContextSummary = (n) =>
     pickText(lang, n?.context_summary_ar, n?.context_summary, '');
@@ -307,63 +295,24 @@ const NotificationsPage = () => {
               <p className="summary-value">{summary.unread_count || 0}</p>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon urgent">
-              <i className="fas fa-exclamation-triangle"></i>
-            </div>
-            <div className="summary-content">
-              <h3>{t('dashboard.notifications.urgent')}</h3>
-              <p className="summary-value">{summary.urgent_count || 0}</p>
-            </div>
-          </div>
-          <div className="summary-card">
-            <div className="summary-icon pending">
-              <i className="fas fa-clock"></i>
-            </div>
-            <div className="summary-content">
-              <h3>{t('dashboard.notifications.pending')}</h3>
-              <p className="summary-value">{summary.pending_count || 0}</p>
-            </div>
-          </div>
         </div>
       )}
 
       <div className="notifications-filters">
         <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-          onClick={() => { setFilter('all'); setCurrentPage(1); }}
+          onClick={() => { setFilter('all'); }}
         >
           {t('dashboard.notifications.all')}
         </button>
         <button
           className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
-          onClick={() => { setFilter('unread'); setCurrentPage(1); }}
+          onClick={() => { setFilter('unread'); }}
         >
           {t('dashboard.notifications.unread')}
           {summary && summary.unread_count > 0 && (
             <span className="filter-badge">{summary.unread_count}</span>
           )}
-        </button>
-        <button
-          className={`filter-btn ${filter === 'urgent' ? 'active' : ''}`}
-          onClick={() => { setFilter('urgent'); setCurrentPage(1); }}
-        >
-          {t('dashboard.notifications.urgent')}
-          {summary && summary.urgent_count > 0 && (
-            <span className="filter-badge urgent">{summary.urgent_count}</span>
-          )}
-        </button>
-        <button
-          className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
-          onClick={() => { setFilter('completed'); setCurrentPage(1); }}
-        >
-          {t('dashboard.notifications.completed')}
-        </button>
-        <button
-          className={`filter-btn ${filter === 'dismissed' ? 'active' : ''}`}
-          onClick={() => { setFilter('dismissed'); setCurrentPage(1); }}
-        >
-          {t('dashboard.notifications.dismissed')}
         </button>
       </div>
 
@@ -372,7 +321,7 @@ const NotificationsPage = () => {
           <i className="fas fa-search"></i>
           <input
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => { setSearch(e.target.value); }}
             placeholder={t('dashboard.notifications.search_placeholder', { defaultValue: 'Search notifications…' })}
           />
         </div>
@@ -391,17 +340,6 @@ const NotificationsPage = () => {
       </div>
 
       <div className="notifications-list-container">
-        {Array.isArray(grouped) && grouped.length > 0 && (
-          <div className="notifications-grouped-summary">
-            {grouped.map((g) => (
-              <span key={`${g.type || g.priority || g.date}-${g.count}`} className="group-chip">
-                <strong>{g.type || g.priority || g.date}</strong>
-                <span className="group-chip-count">{g.count || 0}</span>
-              </span>
-            ))}
-          </div>
-        )}
-
         {notifications.length === 0 ? (
           <div className="empty-state">
             <i className="fas fa-bell-slash"></i>
@@ -414,20 +352,17 @@ const NotificationsPage = () => {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`notification-card ${!notification.read_at ? 'unread' : ''} ${notification.priority === 'urgent' ? 'urgent' : ''}`}
+                  className={`notification-card ${!notification.is_read ? 'unread' : ''}`}
                 >
                   <div className="notification-main" onClick={() => handleNotificationClick(notification)}>
-                    <div className={`notification-icon ${notification.priority}`}>
+                    <div className="notification-icon">
                       <i className={`fas ${notification?.visual?.icon || getNotificationIcon(notification.type)}`}></i>
                     </div>
                     <div className="notification-content">
                       <div className="notification-header">
                         <h3>{getTitle(notification)}</h3>
                         <div className="notification-meta">
-                          {notification.priority === 'urgent' && (
-                            <span className="priority-badge urgent">{t('dashboard.notifications.urgent')}</span>
-                          )}
-                          {!notification.read_at && (
+                          {!notification.is_read && (
                             <span className="unread-badge">{t('dashboard.notifications.unread')}</span>
                           )}
                           <span className="notification-date">
@@ -468,7 +403,7 @@ const NotificationsPage = () => {
                     </div>
                   </div>
                   <div className="notification-actions">
-                    {!notification.read_at && (
+                    {!notification.is_read && (
                       <button
                         className="action-btn read"
                         onClick={() => handleMarkAsRead(notification.id)}
@@ -476,24 +411,6 @@ const NotificationsPage = () => {
                       >
                         <i className="fas fa-check"></i>
                       </button>
-                    )}
-                    {notification.status === 'pending' && (
-                      <>
-                        <button
-                          className="action-btn complete"
-                          onClick={() => handleComplete(notification.id)}
-                          title={t('dashboard.notifications.complete')}
-                        >
-                          <i className="fas fa-check-double"></i>
-                        </button>
-                        <button
-                          className="action-btn dismiss"
-                          onClick={() => handleDismiss(notification.id)}
-                          title={t('dashboard.notifications.dismiss')}
-                        >
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </>
                     )}
                     {(notification.action_url || getQuickAction(notification)?.direct_url) && (
                       <button
@@ -514,30 +431,6 @@ const NotificationsPage = () => {
                 </div>
               ))}
             </div>
-
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                >
-                  <i className="fas fa-chevron-right"></i>
-                  {t('dashboard.pagination.previous')}
-                </button>
-                <span className="pagination-info">
-                  {t('dashboard.pagination.page')} {currentPage} {t('dashboard.pagination.of')} {totalPages}
-                </span>
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  {t('dashboard.pagination.next')}
-                  <i className="fas fa-chevron-left"></i>
-                </button>
-              </div>
-            )}
           </>
         )}
       </div>
