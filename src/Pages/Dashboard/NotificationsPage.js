@@ -5,46 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Watch } from 'react-loader-spinner';
 import { Store } from 'react-notifications-component';
-import { getLang, pickFieldText, pickText, formatDate, formatDateTime, toArray } from '../../Utitlities/uxText';
+import { getLang, formatDateTime } from '../../Utitlities/uxText';
 import { API_BASE_URL } from '../../config';
 import '../../Css/pages/notifications-page.css';
-
-// Helper function to replace contract ID with contract_number in text
-const replaceContractIdWithNumber = (text, contractId, contractNumber) => {
-  if (!text || !contractId || !contractNumber || contractId === contractNumber) return text;
-  
-  const contractIdStr = String(contractId);
-  const contractNumberStr = String(contractNumber);
-  let updatedText = text;
-  
-  // Replace "رقم {id}" pattern (Arabic: "number {id}")
-  updatedText = updatedText.replace(
-    new RegExp(`رقم\\s*${contractIdStr}`, 'g'),
-    `رقم ${contractNumberStr}`
-  );
-  
-  // Replace "Contract #{id}" or "contract #{id}" pattern (English)
-  updatedText = updatedText.replace(
-    new RegExp(`[Cc]ontract\\s*#?\\s*${contractIdStr}`, 'g'),
-    (match) => match.replace(contractIdStr, contractNumberStr)
-  );
-  
-  // Replace standalone "#{id}" pattern
-  updatedText = updatedText.replace(
-    new RegExp(`#${contractIdStr}(?!\\d)`, 'g'),
-    `#${contractNumberStr}`
-  );
-  
-  // Replace standalone number (only if it's clearly a contract reference)
-  if (text.includes('عقد') || text.includes('contract') || text.includes('Contract')) {
-    updatedText = updatedText.replace(
-      new RegExp(`\\b${contractIdStr}\\b`, 'g'),
-      contractNumberStr
-    );
-  }
-  
-  return updatedText;
-};
 
 const NotificationsPage = () => {
   const { t, i18n } = useTranslation(['common']);
@@ -54,19 +17,33 @@ const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [summary, setSummary] = useState({ unread_count: 0, urgent_count: 0 });
   const [filter, setFilter] = useState('all'); // all | unread
-  const [selectedNotification, setSelectedNotification] = useState(null);
-  const [helpOpen, setHelpOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [groupBy, setGroupBy] = useState(''); // reserved (no-op for now)
+  const lang = getLang(i18n);
 
   useEffect(() => {
-    // Light debounce for search/group changes
+    fetchCount();
+    // Light debounce for search/filter changes
     const handle = setTimeout(() => {
       fetchNotifications();
     }, search ? 350 : 0);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, search, groupBy]);
+  }, [filter, search]);
+
+  const fetchCount = async () => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await axios.get(`${API_BASE_URL}/portallogistice/notifications/count`, { headers });
+      if (response.data?.success) {
+        setSummary({
+          unread_count: response.data?.data?.unread_count || 0,
+          urgent_count: response.data?.data?.urgent_count || 0,
+        });
+      }
+    } catch (e) {
+      // non-blocking
+    }
+  };
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -76,10 +53,8 @@ const NotificationsPage = () => {
       if (filter === 'unread') params.read = 'false';
 
       if (search && search.trim()) {
+        // backend currently ignores search; keep param for forward compatibility
         params.search = search.trim();
-      }
-      if (groupBy) {
-        params.group_by = groupBy;
       }
 
       const response = await axios.get(
@@ -91,10 +66,8 @@ const NotificationsPage = () => {
         const items = response.data?.data?.notifications || response.data?.data || [];
         const list = Array.isArray(items) ? items : [];
         setNotifications(list);
-        setSummary({
-          unread_count: list.filter((n) => !n.is_read).length,
-          urgent_count: 0,
-        });
+        // keep count in sync with backend for correctness
+        fetchCount();
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -120,7 +93,7 @@ const NotificationsPage = () => {
         { headers }
       );
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
-      setSummary((s) => ({ ...s, unread_count: Math.max(0, (s?.unread_count || 0) - 1) }));
+      fetchCount();
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.marked_read'),
@@ -143,7 +116,7 @@ const NotificationsPage = () => {
         { headers }
       );
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      setSummary((s) => ({ ...s, unread_count: 0 }));
+      fetchCount();
       Store.addNotification({
         title: t('dashboard.success.title'),
         message: t('dashboard.notifications.all_marked_read'),
@@ -157,57 +130,12 @@ const NotificationsPage = () => {
     }
   };
 
-  const handleComplete = async (id) => {
-    try {
-      const headers = getAuthHeaders();
-      await axios.put(
-        `${API_BASE_URL}/portallogistice/notifications/${id}/complete`,
-        {},
-        { headers }
-      );
-      Store.addNotification({
-        title: t('dashboard.success.title'),
-        message: t('dashboard.notifications.completed'),
-        type: 'success',
-        insert: 'top',
-        container: 'top-right',
-        dismiss: { duration: 2000 }
-      });
-    } catch (error) {
-      console.error('Error completing notification:', error);
-    }
-  };
-
-  const handleDismiss = async (id) => {
-    try {
-      const headers = getAuthHeaders();
-      await axios.put(
-        `${API_BASE_URL}/portallogistice/notifications/${id}/dismiss`,
-        {},
-        { headers }
-      );
-      Store.addNotification({
-        title: t('dashboard.success.title'),
-        message: t('dashboard.notifications.dismissed'),
-        type: 'success',
-        insert: 'top',
-        container: 'top-right',
-        dismiss: { duration: 2000 }
-      });
-    } catch (error) {
-      console.error('Error dismissing notification:', error);
-    }
-  };
-
   const handleNotificationClick = (notification) => {
     if (!notification.is_read) {
       handleMarkAsRead(notification.id);
     }
-    if (notification.action_url) {
-      navigate(notification.action_url);
-    } else {
-      setHelpOpen(false);
-      setSelectedNotification(notification);
+    if (notification.ref_type === 'contract' && notification.ref_id) {
+      navigate('/dashboard/contracts');
     }
   };
 
@@ -234,31 +162,8 @@ const NotificationsPage = () => {
     }
   };
 
-  const lang = getLang(i18n);
-
-  const getTitle = (n) =>
-    pickFieldText(
-      lang,
-      n,
-      ['title_ar', 'title'],
-      ['title_en', 'title'],
-      t('dashboard.notifications.title', { defaultValue: 'Notification' })
-    );
-
-  const getDescription = (n) =>
-    pickFieldText(lang, n, ['body_ar', 'body'], ['body_en', 'body'], '');
-
-  const getContextSummary = (n) =>
-    pickText(lang, n?.context_summary_ar, n?.context_summary, '');
-
-  const getHelp = (n) => {
-    const help = n?.help || null;
-    if (!help) return null;
-    // Backend spec: { en: {...}, ar: {...} }
-    return help?.[lang] || help?.en || help?.ar || null;
-  };
-
-  const getQuickAction = (n) => n?.quick_action || null;
+  const getTitle = (n) => n?.title || t('dashboard.notifications.title', { defaultValue: 'Notification' });
+  const getDescription = (n) => n?.body || '';
 
   if (loading && notifications.length === 0) {
     return (
@@ -325,18 +230,6 @@ const NotificationsPage = () => {
             placeholder={t('dashboard.notifications.search_placeholder', { defaultValue: 'Search notifications…' })}
           />
         </div>
-        <div className="notifications-groupby">
-          <label>{t('dashboard.notifications.group_by', { defaultValue: 'Group by' })}</label>
-          <select
-            value={groupBy}
-            onChange={(e) => { setGroupBy(e.target.value); setCurrentPage(1); }}
-          >
-            <option value="">{t('dashboard.notifications.group_by_none', { defaultValue: 'None' })}</option>
-            <option value="type">{t('dashboard.notifications.group_by_type', { defaultValue: 'Type' })}</option>
-            <option value="priority">{t('dashboard.notifications.group_by_priority', { defaultValue: 'Priority' })}</option>
-            <option value="date">{t('dashboard.notifications.group_by_date', { defaultValue: 'Date' })}</option>
-          </select>
-        </div>
       </div>
 
       <div className="notifications-list-container">
@@ -371,35 +264,8 @@ const NotificationsPage = () => {
                         </div>
                       </div>
                       <p className="notification-description">
-                        {(() => {
-                          const notificationContractNumber = notification.contract_number || notification.contract_id;
-                          const notificationContractId = notification.contract_id;
-                          const description = getDescription(notification);
-                          
-                          return notificationContractId && notificationContractNumber
-                            ? replaceContractIdWithNumber(description, notificationContractId, notificationContractNumber)
-                            : description;
-                        })()}
+                        {getDescription(notification)}
                       </p>
-                      {!!getContextSummary(notification) && (
-                        <div className="notification-context">
-                          <i className="fas fa-info-circle"></i>
-                          <span>{getContextSummary(notification)}</span>
-                        </div>
-                      )}
-                      {notification.deadline && (
-                        <div className="notification-deadline">
-                          <i className="fas fa-clock"></i>
-                          <span>{t('dashboard.notifications.deadline')}: {formatDate(notification.deadline, lang)}</span>
-                          {notification.deadline_remaining_hours !== undefined && (
-                            <span className={`deadline-warning ${notification.deadline_remaining_hours < 24 ? 'urgent' : ''}`}>
-                              {notification.deadline_remaining_hours > 0
-                                ? t('dashboard.notifications.hours_remaining', { hours: notification.deadline_remaining_hours })
-                                : t('dashboard.notifications.overdue')}
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="notification-actions">
@@ -412,21 +278,6 @@ const NotificationsPage = () => {
                         <i className="fas fa-check"></i>
                       </button>
                     )}
-                    {(notification.action_url || getQuickAction(notification)?.direct_url) && (
-                      <button
-                        className="action-btn primary"
-                        onClick={() => navigate(getQuickAction(notification)?.direct_url || notification.action_url)}
-                        title={t('dashboard.notifications.take_action')}
-                      >
-                        <i className={`fas ${getQuickAction(notification)?.icon || 'fa-arrow-left'}`}></i>
-                        {pickText(
-                          lang,
-                          getQuickAction(notification)?.button_text_ar,
-                          getQuickAction(notification)?.button_text,
-                          t('dashboard.notifications.take_action')
-                        )}
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -435,94 +286,6 @@ const NotificationsPage = () => {
         )}
       </div>
 
-      {selectedNotification && (
-        <div className="modal-overlay" onClick={() => setSelectedNotification(null)}>
-          <div className="modal-content notification-detail" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{getTitle(selectedNotification)}</h2>
-              <button className="close-btn" onClick={() => setSelectedNotification(null)}>
-                {t('close')}
-              </button>
-            </div>
-            <div className="modal-body">
-              <p>{(() => {
-                const notificationContractNumber = selectedNotification.contract_number || selectedNotification.contract_id;
-                const notificationContractId = selectedNotification.contract_id;
-                const description = getDescription(selectedNotification);
-                
-                return notificationContractId && notificationContractNumber
-                  ? replaceContractIdWithNumber(description, notificationContractId, notificationContractNumber)
-                  : description;
-              })()}</p>
-              {!!getContextSummary(selectedNotification) && (
-                <div className="detail-context">
-                  <h4>{t('dashboard.notifications.context', { defaultValue: 'Context' })}</h4>
-                  <p>{getContextSummary(selectedNotification)}</p>
-                </div>
-              )}
-              {selectedNotification.deadline && (
-                <div className="detail-deadline">
-                  <i className="fas fa-clock"></i>
-                  <strong>{t('dashboard.notifications.deadline')}:</strong>
-                  {formatDate(selectedNotification.deadline, lang)}
-                </div>
-              )}
-              {!!getHelp(selectedNotification) && (
-                <div className="detail-help">
-                  <button
-                    className="help-toggle-btn"
-                    onClick={() => setHelpOpen((v) => !v)}
-                  >
-                    <i className={`fas ${helpOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-                    {t('dashboard.notifications.how_to', { defaultValue: 'How to complete this' })}
-                  </button>
-                  {helpOpen && (
-                    <div className="help-content">
-                      {getHelp(selectedNotification)?.text && (
-                        <p className="help-text">{getHelp(selectedNotification).text}</p>
-                      )}
-                      {toArray(getHelp(selectedNotification)?.tips).length > 0 && (
-                        <div className="help-list">
-                          <h5>{t('dashboard.notifications.tips', { defaultValue: 'Tips' })}</h5>
-                          <ul>
-                            {toArray(getHelp(selectedNotification)?.tips).map((tip, idx) => (
-                              <li key={idx}>{tip}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {toArray(getHelp(selectedNotification)?.common_mistakes).length > 0 && (
-                        <div className="help-list mistakes">
-                          <h5>{t('dashboard.notifications.common_mistakes', { defaultValue: 'Common mistakes' })}</h5>
-                          <ul>
-                            {toArray(getHelp(selectedNotification)?.common_mistakes).map((m, idx) => (
-                              <li key={idx}>{m}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {(selectedNotification.action_url || getQuickAction(selectedNotification)?.direct_url) && (
-                <button
-                  className="primary-btn"
-                  onClick={() => navigate(getQuickAction(selectedNotification)?.direct_url || selectedNotification.action_url)}
-                >
-                  {pickText(
-                    lang,
-                    getQuickAction(selectedNotification)?.button_text_ar,
-                    getQuickAction(selectedNotification)?.button_text,
-                    t('dashboard.notifications.take_action')
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
