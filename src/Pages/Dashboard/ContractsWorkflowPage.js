@@ -5,7 +5,41 @@ import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
 import PaymentReceiptUploadModal from '../../Components/PaymentReceiptUploadModal';
 
-const CONTRACTORS_GUIDE_PDF_HREF = 'https://portallogisticejoin-as-investor.com/storage/contractor-info.pdf';
+const DRAFT_RENTAL_CONTRACT_HREF = '/files/rental_contract.pdf';
+const DRAFT_SALE_CONTRACT_HREF = '/files/sale_contract.pdf';
+const CONTRACTOR_INFO_PDF_HREF =
+  process.env.REACT_APP_CONTRACTOR_INFO_PDF_URL || '/files/contractor_info.pdf';
+
+/** يظهر فقط عند إتاحة رفع إيصال الدفع لعقد المبايعة */
+const ReceiptUploadContractorHint = () => (
+  <div
+    className="contracts-workflow-receipt-hint"
+    role="region"
+    aria-label="معلومات المتعاقدين قبل رفع إيصال الدفع"
+  >
+    <div className="contracts-workflow-receipt-hint-main">
+      <span className="contracts-workflow-receipt-hint-icon" aria-hidden="true">
+        <i className="fas fa-lightbulb"></i>
+      </span>
+      <div className="contracts-workflow-receipt-hint-copy">
+        <span className="contracts-workflow-receipt-hint-title">قبل رفع إيصال الدفع</span>
+        <span className="contracts-workflow-receipt-hint-desc">
+          راجع ملف معلومات المتعاقدين للتأكد من بيانات التحويل والإجراءات المطلوبة، ثم ارفع الإيصال.
+        </span>
+      </div>
+    </div>
+    <a
+      className="contracts-workflow-receipt-hint-link"
+      href={CONTRACTOR_INFO_PDF_HREF}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <i className="fas fa-file-pdf" aria-hidden="true"></i>
+      <span>فتح معلومات المتعاقدين (PDF)</span>
+      <i className="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+    </a>
+  </div>
+);
 
 function nafathErrorMessage(error) {
   const status = error?.response?.status;
@@ -25,33 +59,44 @@ function nafathErrorMessage(error) {
 }
 
 const ContractsWorkflowGuideBanner = ({ compact }) => (
-  
   <div
     className={`contracts-workflow-guide${compact ? ' contracts-workflow-guide--compact' : ''}`}
     role="region"
-    aria-label="دليل معلومات المتعاقدين"
+    aria-label="مسودات عقود الإيجار والمبايعة"
   >
     <div className="contracts-workflow-guide-inner">
       <span className="contracts-workflow-guide-icon" aria-hidden="true">
         <i className="fas fa-file-pdf"></i>
       </span>
       <div className="contracts-workflow-guide-text">
-        <strong>معلومات المتعاقدين</strong>
+        <strong>نماذج العقود (مسودات PDF)</strong>
         {!compact && (
           <span className="contracts-workflow-guide-desc">
-            اطّلع على الدليل التعريفي قبل أو أثناء متابعة عقودك.
+            راجع مسودة عقد الإيجار ومسودة عقد المبايعة قبل أو أثناء متابعة عقودك.
           </span>
         )}
       </div>
-      <a
-        className="contracts-workflow-guide-btn"
-        href={CONTRACTORS_GUIDE_PDF_HREF}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span>فتح الدليل (PDF)</span>
-        <i className="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
-      </a>
+      <div className="contracts-workflow-guide-actions">
+        <a
+          className="contracts-workflow-guide-btn contracts-workflow-guide-btn--rental"
+          href={DRAFT_RENTAL_CONTRACT_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>مسودة عقد إيجار</span>
+          <i className="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+        <a
+          className="contracts-workflow-guide-btn contracts-workflow-guide-btn--sale"
+          href={DRAFT_SALE_CONTRACT_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>مسودة عقد مبايعة</span>
+          <i className="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+        
+      </div>
     </div>
   </div>
 );
@@ -254,7 +299,7 @@ const savePaymentReceipt = async (file) => {
             const meta = getStatusMeta(contract.status);
             const isBusy = submittingId === contract.id;
             const canVerify = contract.status === 'sent';
-            const canUploadReceipt = contract.status === 'approved' && !contract.payment_receipt_path;
+            const canUploadReceipt = contract.status === 'approved' && contract.type === 'sale' && !contract.payment_receipt_path;
 
             return (
               <div key={contract.id} className="contracts-workflow-card">
@@ -275,6 +320,8 @@ const savePaymentReceipt = async (file) => {
                     {meta.label}
                   </span>
                 </div>
+
+                {canUploadReceipt ? <ReceiptUploadContractorHint /> : null}
 
                 <div className="contracts-workflow-actions-row">
                   {contract.file_url ? (

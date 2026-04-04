@@ -136,8 +136,7 @@ root.render(
             element={<Navigate to="/admin" replace />} 
           />
           
-          {/* Catch all - redirect to login */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          
         </Routes>
       </AuthProvider>
     </BrowserRouter>
