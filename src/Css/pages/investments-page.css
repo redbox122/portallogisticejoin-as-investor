@@ -1,0 +1,641 @@
+/* Investments page — استثماراتي */
+
+.investments-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 28px);
+  direction: rtl;
+  animation: investmentsPageIn 0.45s ease-out;
+}
+
+@keyframes investmentsPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.investments-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: clamp(20px, 4vw, 28px) clamp(18px, 3vw, 26px);
+  margin-bottom: 24px;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(7, 52, 145, 0.14) 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    linear-gradient(165deg, #f8fafc 0%, #ffffff 45%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.investments-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30' stroke='%23073491' stroke-opacity='0.04' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.investments-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.investments-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #073491;
+  text-transform: none;
+  margin-bottom: 8px;
+}
+
+.investments-kicker i {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.investments-title {
+  margin: 0 0 10px;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.investments-lead {
+  margin: 0;
+  max-width: 42em;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #64748b;
+}
+
+.investments-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.investments-stat {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.investments-stat:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.investments-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.investments-stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.investments-stat-value--accent {
+  color: #073491;
+}
+
+.investments-stat-value--success {
+  color: #15803d;
+}
+
+.investments-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 220px;
+  color: #64748b;
+}
+
+.investments-loading-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #e2e8f0;
+  border-top-color: #073491;
+  animation: investmentsSpin 0.75s linear infinite;
+}
+
+@keyframes investmentsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.investments-loading-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.investments-skeleton {
+  display: grid;
+  gap: 16px;
+}
+
+.investments-skeleton-card {
+  height: 168px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: investmentsShimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes investmentsShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.investments-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.investments-error i {
+  flex-shrink: 0;
+}
+
+.investments-error-retry {
+  margin-inline-start: auto;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #ffffff;
+  color: #073491;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.investments-error-retry:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.investments-error-retry:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.investments-empty {
+  text-align: center;
+  padding: clamp(40px, 8vw, 72px) 24px;
+  border-radius: 20px;
+  border: 2px dashed #e2e8f0;
+  background: #fafbfc;
+}
+
+.investments-empty-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eff6ff 0%, #f1f5f9 100%);
+  border: 1px solid #e0e7ff;
+  color: #073491;
+  font-size: 28px;
+}
+
+.investments-empty h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.investments-empty p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  max-width: 280px;
+  margin-inline: auto;
+  line-height: 1.55;
+}
+
+/* Contract card */
+.investments-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: clamp(16px, 3vw, 22px) clamp(16px, 3vw, 24px);
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.investments-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border-color: #d1d5db;
+}
+
+.investments-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.investments-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.investments-card-id {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.investments-badge-type {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.investments-badge-type--sale {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.investments-badge-type--rental {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.investments-card-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.investments-badge-approved {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.investments-card-date {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.investments-card-date strong {
+  color: #334155;
+  font-weight: 700;
+}
+
+.investments-callout {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.investments-callout--ok {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.investments-callout--pending {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.investments-callout i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.investments-callout strong {
+  font-weight: 800;
+}
+
+.investments-callout-status {
+  margin-inline-start: auto;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.investments-callout-status--ok {
+  color: #15803d;
+}
+
+.investments-activation-bar {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 999px;
+  background: #fef3c7;
+  overflow: hidden;
+}
+
+.investments-activation-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  transition: width 0.5s ease;
+}
+
+.investments-activation-bar-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.investments-toggle {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.investments-toggle--active {
+  border-color: #073491;
+  background: linear-gradient(135deg, #073491 0%, #1e4fad 100%);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(7, 52, 145, 0.28);
+}
+
+.investments-toggle--active:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(7, 52, 145, 0.35);
+}
+
+.investments-toggle--active:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.investments-schedule {
+  margin-top: 20px;
+  animation: investmentsPageIn 0.35s ease-out;
+}
+
+.investments-schedule-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 16px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.investments-schedule-loading .investments-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border-width: 2px;
+}
+
+.investments-schedule-error {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.investments-schedule-error i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.investments-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.investments-summary-pill {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.investments-summary-pill strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.investments-summary-pill--paid strong {
+  color: #15803d;
+}
+
+.investments-summary-pill--due strong {
+  color: #b45309;
+}
+
+.investments-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  -webkit-overflow-scrolling: touch;
+}
+
+.investments-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 13px;
+  direction: rtl;
+}
+
+.investments-table thead tr {
+  background: linear-gradient(180deg, #073491 0%, #0a3d99 100%);
+  color: #ffffff;
+}
+
+.investments-table th {
+  padding: 12px 14px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.investments-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.investments-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.investments-table td {
+  padding: 11px 14px;
+  text-align: right;
+  border-bottom: 1px solid #f1f5f9;
+  color: #374151;
+  font-variant-numeric: tabular-nums;
+}
+
+.investments-table td.investments-td-amount {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.investments-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.investments-status-pill--received {
+  background: rgba(21, 128, 61, 0.12);
+  color: #15803d;
+  border-color: rgba(21, 128, 61, 0.25);
+}
+
+.investments-status-pill--pending {
+  background: rgba(180, 83, 9, 0.12);
+  color: #b45309;
+  border-color: rgba(180, 83, 9, 0.22);
+}
+
+.investments-status-pill--sent {
+  background: rgba(29, 78, 216, 0.12);
+  color: #1d4ed8;
+  border-color: rgba(29, 78, 216, 0.22);
+}
+
+.investments-status-pill--reported_missing {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.22);
+}
+
+.investments-table-hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .investments-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .investments-card-head {
+    flex-direction: column;
+  }
+
+  .investments-badge-approved {
+    align-self: flex-start;
+  }
+}

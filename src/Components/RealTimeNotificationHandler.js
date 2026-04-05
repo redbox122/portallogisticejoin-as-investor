@@ -79,7 +79,7 @@ const RealTimeNotificationHandler = ({ onNotificationCountChange }) => {
 
     // Poll for new notifications every 15 seconds (more frequent than the bell)
     pollingIntervalRef.current = setInterval(() => {
-      checkForNewNotifications();
+      // checkForNewNotifications();
     }, 15000); // 15 seconds
 
     return () => {

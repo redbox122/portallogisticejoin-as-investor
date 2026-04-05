@@ -21,7 +21,7 @@ const NotificationsPage = () => {
   const lang = getLang(i18n);
 
   useEffect(() => {
-    fetchCount();
+    // fetchCount();
     // Light debounce for search/filter changes
     const handle = setTimeout(() => {
       fetchNotifications();

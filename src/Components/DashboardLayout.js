@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/AuthContext';
@@ -19,6 +19,8 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const { getAuthHeaders, isAuthenticated, user, logout } = useAuth();
   const userMenuRef = useRef(null);
+  const userMenuDropdownId = useId();
+  const userMenuTriggerId = useId();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isRTL, setIsRTL] = useState(i18n.language === 'ar');
@@ -112,6 +114,18 @@ const DashboardLayout = () => {
     return () => document.removeEventListener('mousedown', onDown);
   }, []);
 
+  useEffect(() => {
+    if (!userMenuOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setUserMenuOpen(false);
+        document.getElementById(userMenuTriggerId)?.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [userMenuOpen, userMenuTriggerId]);
+
   const displayName = useMemo(() => {
     const parts = [user?.first_name, user?.family_name || user?.last_name].filter(Boolean);
     const joined = parts.join(' ').trim();
@@ -143,7 +157,7 @@ const DashboardLayout = () => {
       }
     };
 
-    fetchCount();
+    // fetchCount();
     const interval = setInterval(fetchCount, 30000);
     return () => {
       cancelled = true;
@@ -244,94 +258,141 @@ const DashboardLayout = () => {
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((v) => !v);
   };
 
+  const closeUserMenu = () => setUserMenuOpen(false);
+  const notificationsLabel = isRTL ? 'الإشعارات' : 'Notifications';
+  const themeLabel =
+    theme === 'dark'
+      ? isRTL
+        ? 'الوضع الفاتح'
+        : 'Light mode'
+      : isRTL
+        ? 'الوضع الداكن'
+        : 'Dark mode';
   return (
     <div className="admin-layout" data-admin-theme={theme} dir={isRTL ? 'rtl' : 'ltr'}>
       <UserSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
-      
+
       <div className="admin-content-wrapper">
-        <header className="admin-header">
-          <div className="header-left">
+        <header className="admin-header admin-header--dashboard">
+          <div className="admin-header__start">
             <SaasLanguageSwitcher />
-            <button className="sidebar-toggle-btn" onClick={toggleSidebar} type="button" aria-label={isRTL ? 'فتح القائمة' : 'Open menu'}>
-              <i className="fas fa-bars" />
+            <button
+              className="sidebar-toggle-btn"
+              onClick={toggleSidebar}
+              type="button"
+              aria-expanded={sidebarOpen}
+              aria-controls="dashboard-sidebar-nav"
+              aria-label={isRTL ? 'فتح أو إغلاق القائمة' : 'Open or close menu'}
+            >
+              <i className="fas fa-bars" aria-hidden="true" />
             </button>
-            <div className="header-breadcrumb" />
           </div>
-          <div className="header-right">
+
+          <div className="admin-header__center">
+            <label className="visually-hidden" htmlFor="dashboard-header-search">
+              {isRTL ? 'بحث في لوحة التحكم' : 'Search dashboard'}
+            </label>
             <div className="admin-header-search-wrap">
               <input
+                id="dashboard-header-search"
                 className="admin-header-search"
-                placeholder="ابحث..."
+                placeholder={isRTL ? 'ابحث...' : 'Search...'}
                 value={searchQuery}
                 onChange={onSearchChange}
+                type="search"
+                autoComplete="off"
               />
               <i className="fas fa-search admin-header-search-icon" aria-hidden="true" />
             </div>
+          </div>
 
-            <button
-              type="button"
-              className="admin-notifications-btn"
-              aria-label="Notifications"
-              onClick={() => navigate('/dashboard/notifications')}
-            >
-              <i className="fas fa-bell" />
-              {notificationCount > 0 && (
-                <span className="admin-notifications-count">
-                  {notificationCount > 99 ? '99+' : notificationCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              className="admin-theme-toggle-btn"
-              aria-label="Toggle theme"
-              onClick={toggleTheme}
-            >
-              <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`} />
-            </button>
-
-            <div className="user-header-menu-wrap" ref={userMenuRef}>
+          <div className="admin-header__end">
+            <div className="admin-header__toolbar" role="toolbar" aria-label={isRTL ? 'أدوات شريط العنوان' : 'Header tools'}>
               <button
                 type="button"
+                className="admin-notifications-btn"
+                aria-label={notificationsLabel}
+                onClick={() => {
+                  closeUserMenu();
+                  navigate('/dashboard/notifications');
+                }}
+              >
+                <i className="fas fa-bell" aria-hidden="true" />
+                {notificationCount > 0 && (
+                  <span className="admin-notifications-count" aria-hidden="true">
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="admin-theme-toggle-btn"
+                aria-label={themeLabel}
+                onClick={toggleTheme}
+              >
+                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="user-header-menu-wrap" ref={userMenuRef}>
+              {userMenuOpen && (
+                <button
+                  type="button"
+                  className="user-header-menu-backdrop"
+                  aria-label={isRTL ? 'إغلاق قائمة الحساب' : 'Close account menu'}
+                  tabIndex={-1}
+                  onClick={closeUserMenu}
+                />
+              )}
+              <button
+                type="button"
+                id={userMenuTriggerId}
                 className="user-header-menu-trigger"
                 onClick={() => setUserMenuOpen((o) => !o)}
                 aria-expanded={userMenuOpen}
-                aria-haspopup="true"
+                aria-haspopup="menu"
+                aria-controls={userMenuDropdownId}
+                aria-label={isRTL ? `${displayName}، قائمة الحساب` : `${displayName}, account menu`}
               >
-                <div className="admin-header-avatar" aria-hidden>
+                <span className="admin-header-avatar" aria-hidden="true">
                   {avatarInitial}
-                </div>
-                <div className="admin-header-meta">
+                </span>
+                <span className="admin-header-meta" aria-hidden="true">
                   <span className="admin-name">{displayName}</span>
                   <span className="admin-header-date">{dateLabel}</span>
-                </div>
+                </span>
                 <i
                   className={`fas fa-chevron-down user-header-chevron ${userMenuOpen ? 'user-header-chevron--open' : ''}`}
-                  aria-hidden
+                  aria-hidden="true"
                 />
               </button>
 
               {userMenuOpen && (
-                <div className="user-header-dropdown" role="menu">
+                <div
+                  className="user-header-dropdown"
+                  id={userMenuDropdownId}
+                  role="menu"
+                  aria-labelledby={userMenuTriggerId}
+                >
                   <div className="user-header-dropdown-header">
                     <p className="user-header-dropdown-name">{displayName}</p>
                     <p className="user-header-dropdown-email">{user?.email || '—'}</p>
                   </div>
-                  <div className="user-header-dropdown-divider" />
+                  <div className="user-header-dropdown-divider" role="presentation" />
                   <button
                     type="button"
                     className="user-header-dropdown-item"
                     role="menuitem"
                     onClick={() => {
-                      setUserMenuOpen(false);
+                      closeUserMenu();
                       navigate('/dashboard/profile');
                     }}
                   >
-                    <i className="fas fa-user" aria-hidden />
+                    <i className="fas fa-user" aria-hidden="true" />
                     {i18n.language === 'ar' ? 'الملف الشخصي' : 'Profile'}
                   </button>
                   <button
@@ -339,21 +400,21 @@ const DashboardLayout = () => {
                     className="user-header-dropdown-item"
                     role="menuitem"
                     onClick={() => {
-                      setUserMenuOpen(false);
+                      closeUserMenu();
                       navigate('/dashboard/settings');
                     }}
                   >
-                    <i className="fas fa-cog" aria-hidden />
+                    <i className="fas fa-cog" aria-hidden="true" />
                     {i18n.language === 'ar' ? 'الإعدادات' : 'Settings'}
                   </button>
-                  <div className="user-header-dropdown-divider" />
+                  <div className="user-header-dropdown-divider" role="presentation" />
                   <button
                     type="button"
                     className="user-header-dropdown-item user-header-dropdown-item--danger"
                     role="menuitem"
                     onClick={handleLogout}
                   >
-                    <i className="fas fa-sign-out-alt" aria-hidden />
+                    <i className="fas fa-sign-out-alt" aria-hidden="true" />
                     {i18n.language === 'ar' ? 'تسجيل الخروج' : 'Log out'}
                   </button>
                 </div>
@@ -362,7 +423,7 @@ const DashboardLayout = () => {
           </div>
         </header>
 
-        <main className="admin-main-content">
+        <main className="admin-main-content" id="dashboard-main-content">
           <Outlet />
         </main>
       </div>

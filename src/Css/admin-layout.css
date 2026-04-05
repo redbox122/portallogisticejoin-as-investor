@@ -1,4 +1,17 @@
 /* Admin Layout Styles - Matching User Dashboard */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .admin-layout {
   min-height: 100vh;
   background: #f5f7fa;
@@ -32,6 +45,49 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #e5e7eb;
+}
+
+/* User dashboard: 3-column grid — start | search | tools + account */
+.admin-header--dashboard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 20px;
+}
+
+.admin-header__start {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.admin-header__center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.admin-header__center .admin-header-search-wrap {
+  width: 100%;
+  max-width: 480px;
+  min-width: 0;
+}
+
+.admin-header__end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.admin-header__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .header-left {
@@ -125,7 +181,7 @@
 /* Header extras (Search / Notifications / Theme) */
 .admin-header-search-wrap {
   position: relative;
-  min-width: 320px;
+  min-width: 0;
   flex: 1;
 }
 
@@ -188,7 +244,9 @@
 .admin-notifications-count {
   position: absolute;
   top: -9px;
-  right: -9px;
+  inset-inline-end: -9px;
+  left: auto;
+  right: auto;
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
@@ -270,9 +328,13 @@
     padding: 16px;
   }
 
-  .admin-header-search-wrap {
-    min-width: 200px;
-    max-width: min(360px, 40vw);
+  .admin-header--dashboard {
+    gap: 12px 14px;
+    padding: 14px 18px;
+  }
+
+  .admin-header__center .admin-header-search-wrap {
+    max-width: 100%;
   }
 }
 
@@ -281,6 +343,15 @@
   .admin-header {
     padding: 10px 12px;
     gap: 8px;
+  }
+
+  .admin-header--dashboard {
+    grid-template-columns: auto 1fr auto;
+    gap: 8px 10px;
+  }
+
+  .admin-header__center {
+    display: none;
   }
 
   .header-left,

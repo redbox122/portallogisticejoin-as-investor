@@ -22,7 +22,7 @@ const DashboardSidebar = ({ isOpen, onToggle }) => {
   }, [i18n.language]);
 
   useEffect(() => {
-    fetchNotificationCount();
+    // fetchNotificationCount();
     const interval = setInterval(fetchNotificationCount, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);

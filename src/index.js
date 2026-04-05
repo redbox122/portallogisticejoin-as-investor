@@ -31,7 +31,6 @@ import './Css/pages/admin-settings-page.css';
 import './Css/pages/admin-users-page.css';
 import './Css/pages/admin-contracts-page.css';
 import './Css/pages/admin-email-templates-page.css';
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './Context/AuthContext';
 import LoginPage from './Pages/LoginPage';
@@ -61,6 +60,8 @@ import './i18n/i18n.js';
 import { ReactNotifications } from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
 import { setupAxios401Interceptor } from './utils/api';
+import InvestmentsPage from './Pages/Dashboard/InvestmentsPage.js';
+import AdminInvestmentsPage from './Pages/Admin/AdminInvestmentsPage.js';
 
 /* Apply saved theme + RTL before first paint (user dashboard + global) */
 (() => {
@@ -101,9 +102,10 @@ root.render(
             <Route index element={<OverviewPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="contracts" element={<ContractsWorkflowPage />} />
-            <Route path="payments" element={<PaymentsRouteGuard><PaymentsPage /></PaymentsRouteGuard>} />
+            <Route path="payments" element={<PaymentsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<ProfilePage />} />
+            <Route path="investments" element={<InvestmentsPage />} />
             <Route path="tasks" element={<TasksPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
             <Route path="contractor-info" element={<ContractInfoPage />} />
@@ -121,6 +123,7 @@ root.render(
             <Route index element={<AdminOverviewPage />} />
             <Route path="statistics" element={<AdminStatisticsPage />} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="investments" element={<AdminInvestmentsPage />} />
             <Route path="contracts" element={<AdminContractsPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />
             <Route path="analytics" element={<AdminAnalyticsPage />} />

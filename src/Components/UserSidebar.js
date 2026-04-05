@@ -17,7 +17,7 @@ const UserSidebar = ({ isOpen, onToggle }) => {
 
   const menuItems = [
     { id: 'home', path: '/dashboard', icon: 'fa-home', label: 'الرئيسية', exact: true },
-    { id: 'investments', path: '/dashboard?section=investments', icon: 'fa-piggy-bank', label: 'استثماراتي' },
+    { id: 'investments', path: '/dashboard/investments', icon: 'fa-piggy-bank', label: 'استثماراتي' },
     { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', label: 'العقود' },
     { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', label: 'الأرباح' },
     { id: 'profile', path: '/dashboard/profile', icon: 'fa-user', label: 'الملف الشخصي' },
@@ -25,14 +25,14 @@ const UserSidebar = ({ isOpen, onToggle }) => {
   ];
 
   const isActive = (item) => {
-    if (item.id === 'home') {
-      const isInvest = location.search.includes('section=investments');
-      return location.pathname === '/dashboard' && !isInvest;
-    }
+    // if (item.id === 'home') {
+    //   const isInvest = location.search.includes('section=investments');
+    //   return location.pathname === '/dashboard' && !isInvest;
+    // }
 
-    if (item.id === 'investments') {
-      return location.pathname === '/dashboard' && location.search.includes('section=investments');
-    }
+    // if (item.id === 'investments') {
+    //   return location.pathname === '/dashboard' && location.search.includes('section=investments');
+    // }
 
     return item.exact ? location.pathname === item.path : location.pathname === item.path || location.pathname.startsWith(item.path);
   };
@@ -65,7 +65,7 @@ const UserSidebar = ({ isOpen, onToggle }) => {
           </button>
         </div>
 
-        <nav className="admin-sidebar-nav">
+        <nav className="admin-sidebar-nav" id="dashboard-sidebar-nav" aria-label="لوحة التنقل">
           <ul className="admin-nav-menu">
             {menuItems.map((item) => (
               <li key={item.id} className="admin-nav-item">

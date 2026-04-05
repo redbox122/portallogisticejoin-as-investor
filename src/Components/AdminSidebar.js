@@ -25,7 +25,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
     },
     {
       id: 'investments',
-      path: '/admin?section=investments',
+      path: '/admin/investments',
       icon: 'fa-piggy-bank',
       label: 'الاستثمارات',
     },
@@ -70,14 +70,14 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
   const isActive = (item) => {
     if (item.id === 'home') {
       // Home is active only when no investments section query is set
-      const isInvest = location.search.includes('section=investments');
-      const isFav = location.search.includes('section=favorites');
+      const isInvest = location.search.includes('investments');
+      const isFav = location.search.includes('favorites');
       return location.pathname === '/admin' && !isInvest && !isFav;
     }
 
-    if (item.id === 'investments') {
-      return location.pathname === '/admin' && location.search.includes('section=investments');
-    }
+    // if (item.id === 'investments') {
+    //   return location.pathname === '/admin' && location.search.includes('section=investments');
+    // }
 
     if (item.id === 'favorites') {
       return location.pathname === '/admin' && location.search.includes('section=favorites');
