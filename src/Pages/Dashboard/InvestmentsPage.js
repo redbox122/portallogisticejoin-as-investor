@@ -377,35 +377,6 @@ const ContractCard = ({ contract, getAuthHeaders }) => {
   );
 };
 
-// ── STATIC TEST DATA ──────────────────────────────────────────────────────────
-
-const STATIC_CONTRACTS = [
-  {
-    id: 11,
-    title: 'عقد استثمار - وحدة A3',
-    type: 'sale',
-    status: 'approved',
-    approved_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    total_amount: 180000,
-    monthly_payment_amount: 15000,
-    payments: [
-      { month_number: 1, amount: 15000, status: 'received', payment_date: null },
-      { month_number: 2, amount: 15000, status: 'received', payment_date: null },
-      { month_number: 3, amount: 15000, status: 'pending', payment_date: null },
-    ],
-  },
-  {
-    id: 12,
-    title: 'عقد استثمار - وحدة B7',
-    type: 'rental',
-    status: 'approved',
-    approved_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    total_amount: 120000,
-    monthly_payment_amount: 10000,
-    payments: [],
-  },
-];
-
 // ── main page ─────────────────────────────────────────────────────────────────
 
 const InvestmentsPage = () => {
@@ -423,11 +394,11 @@ const InvestmentsPage = () => {
       });
       const all = res.data?.data || [];
       const approved = all.filter((c) => c.status === 'approved');
-      setContracts(approved.length ? approved : STATIC_CONTRACTS);
+      setContracts(approved);
     } catch (err) {
       console.error('Failed to load contracts', err);
-      setContracts(STATIC_CONTRACTS);
-      setError(null);
+      setContracts([]);
+      setError(err?.response?.data?.message || 'تعذر تحميل الاستثمارات. حاول مرة أخرى.');
     } finally {
       setLoading(false);
     }
