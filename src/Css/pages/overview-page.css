@@ -268,18 +268,257 @@
 .ov-months-num   { display: block; font-size: 28px; font-weight: 800; color: #073491; }
 .ov-months-label { font-size: 12px; color: #6b7280; }
 
+/* ── Dark Mode ─────────────────────────────────────────────────────────────── */
+
+html.dark .ov-page {
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+html.dark .ov-greeting-title {
+  color: #f0f4f8;
+}
+
+html.dark .ov-greeting-sub {
+  color: #a0aec0;
+}
+
+html.dark .ov-kpi {
+  background: rgba(17, 24, 39, 0.5);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark .ov-kpi--blue  { background: rgba(30, 58, 138, 0.3); border-color: rgba(37, 99, 235, 0.3); }
+html.dark .ov-kpi--green { background: rgba(6, 78, 59, 0.3); border-color: rgba(16, 185, 129, 0.3); }
+html.dark .ov-kpi--amber { background: rgba(78, 22, 6, 0.3); border-color: rgba(245, 158, 11, 0.3); }
+html.dark .ov-kpi--teal  { background: rgba(12, 74, 110, 0.3); border-color: rgba(20, 184, 166, 0.3); }
+
+html.dark .ov-kpi--blue  .ov-kpi-icon { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+html.dark .ov-kpi--green .ov-kpi-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+html.dark .ov-kpi--amber .ov-kpi-icon { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+html.dark .ov-kpi--teal  .ov-kpi-icon { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; }
+
+html.dark .ov-kpi-value { color: #f0f4f8; }
+html.dark .ov-kpi-label { color: #a0aec0; }
+html.dark .ov-kpi-sub { color: #6b7280; }
+
+html.dark .ov-card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark .ov-card-title {
+  color: #f0f4f8;
+}
+
+html.dark .ov-card-title i { color: #60a5fa; }
+
+html.dark .ov-ring-pct { color: #f0f4f8; }
+html.dark .ov-ring-label { color: #a0aec0; }
+
+html.dark .ov-pstat { color: #cbd5e1; }
+html.dark .ov-pstat-label { color: #a0aec0; }
+html.dark .ov-pstat strong { color: #f0f4f8; }
+
+html.dark .ov-pay-bar {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+html.dark .ov-pay-bar-labels {
+  color: #a0aec0;
+}
+
+html.dark .ov-next-amount {
+  color: #60a5fa;
+}
+
+html.dark .ov-next-amount--overdue { color: #f87171; }
+html.dark .ov-next-amount--urgent  { color: #fb923c; }
+
+html.dark .ov-next-date {
+  color: #a0aec0;
+}
+
+html.dark .ov-next-empty {
+  color: #34d399;
+}
+
+html.dark .ov-next-empty p {
+  color: #a0aec0;
+}
+
+html.dark .ov-breakdown-title {
+  color: #a0aec0;
+}
+
+html.dark .ov-breakdown-item {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark .ov-breakdown-item--green { background: rgba(6, 78, 59, 0.3); border-color: rgba(16, 185, 129, 0.3); }
+html.dark .ov-breakdown-item--amber { background: rgba(78, 22, 6, 0.3); border-color: rgba(245, 158, 11, 0.3); }
+html.dark .ov-breakdown-item--blue  { background: rgba(30, 58, 138, 0.3); border-color: rgba(37, 99, 235, 0.3); }
+
+html.dark .ov-breakdown-num { color: #f0f4f8; }
+html.dark .ov-breakdown-lbl { color: #a0aec0; }
+html.dark .ov-breakdown-item--green .ov-breakdown-num { color: #34d399; }
+html.dark .ov-breakdown-item--amber .ov-breakdown-num { color: #fbbf24; }
+html.dark .ov-breakdown-item--blue  .ov-breakdown-num { color: #60a5fa; }
+
+html.dark .ov-monthly-label { color: #a0aec0; }
+html.dark .ov-monthly-amount { color: #f0f4f8; }
+html.dark .ov-monthly-icon { color: #60a5fa; }
+html.dark .ov-months-num { color: #60a5fa; }
+html.dark .ov-months-label { color: #a0aec0; }
+
+html.dark .ov-loading-text { color: #60a5fa; }
+
+html.dark .ov-error-chip {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #f87171;
+}
+
 /* ── responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .ov-page {
+    padding: 20px 16px;
+  }
+}
 
 @media (max-width: 900px) {
   .ov-kpi-grid  { grid-template-columns: repeat(2, 1fr); }
   .ov-main-grid { grid-template-columns: 1fr; }
+  .ov-kpi-value { font-size: 18px; }
+  .ov-greeting { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .ov-page {
+    padding: 16px 12px;
+    max-width: 100%;
+  }
+
+  .ov-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ov-kpi {
+    padding: 16px;
+  }
+
+  .ov-kpi-value { font-size: 18px; }
+  .ov-kpi-label { font-size: 12px; }
+
+  .ov-greeting-title { font-size: 18px; }
+  .ov-greeting-sub { font-size: 13px; }
+
+  .ov-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .ov-card-title { font-size: 14px; }
+
+  .ov-progress-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .ov-ring-wrap {
+    width: 90px;
+    height: 90px;
+  }
+
+  .ov-progress-stats {
+    width: 100%;
+  }
+
+  .ov-pstat {
+    font-size: 12px;
+  }
+
+  .ov-breakdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .ov-next-amount {
+    font-size: 26px;
+  }
+
+  .ov-next-currency {
+    font-size: 14px;
+  }
+
+  .ov-monthly-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ov-monthly-info {
+    justify-content: center;
+  }
+
+  .ov-months-num { font-size: 24px; }
+
+  .ov-pay-bar-labels {
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 480px) {
-  .ov-kpi-grid        { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .ov-kpi-value       { font-size: 16px; }
-  .ov-breakdown-grid  { grid-template-columns: repeat(2, 1fr); }
-  .ov-next-amount     { font-size: 26px; }
-  .ov-progress-body   { flex-direction: column; align-items: flex-start; }
-  .ov-page            { padding: 16px 12px; }
+  .ov-page {
+    padding: 12px 8px;
+  }
+
+  .ov-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .ov-card {
+    padding: 14px;
+  }
+
+  .ov-greeting-title {
+    font-size: 16px;
+  }
+
+  .ov-greeting-sub {
+    font-size: 12px;
+  }
+
+  .ov-error-chip {
+    font-size: 12px;
+  }
+
+  .ov-card-title {
+    font-size: 13px;
+  }
+
+  .ov-kpi-value { font-size: 16px; }
+
+  .ov-next-amount { font-size: 22px; }
+
+  .ov-breakdown-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
+  .ov-breakdown-num { font-size: 16px; }
+  .ov-breakdown-lbl { font-size: 10px; }
+
+  .ov-ring-wrap {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ov-monthly-amount {
+    font-size: 16px;
+  }
+
+  .ov-months-num { font-size: 20px; }
 }

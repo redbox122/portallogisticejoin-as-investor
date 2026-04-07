@@ -58,7 +58,6 @@ import AdminActivityLogsPage from './Pages/Admin/ActivityLogsPage';
 import AdminSettingsPage from './Pages/Admin/SettingsPage';
 import AdminEmailTemplatesPage from './Pages/Admin/EmailTemplatesPage';
 import ProtectedRoute from './Components/ProtectedRoute';
-import PaymentsRouteGuard from './Components/PaymentsRouteGuard';
 import './i18n/i18n.js';
 import { ReactNotifications } from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';

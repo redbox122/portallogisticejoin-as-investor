@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { API_BASE_URL } from '../../config';
+import {  formatDateShort as utilFormatDateShort, formatDate as utilFormatDate } from '../../utils/formatters';
 import '../../Css/pages/investments-page.css';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -12,22 +13,12 @@ function addDays(date, days) {
   return d;
 }
 
-function formatDateAr(date) {
-  if (!date) return '—';
-  return new Date(date).toLocaleDateString('ar-SA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+function formatDateAr(date, locale = 'ar') {
+  return utilFormatDate(date, locale);
 }
 
-function formatDateShort(date) {
-  if (!date) return '—';
-  return new Date(date).toLocaleDateString('ar-SA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
+function formatDateShort(date, locale = 'ar') {
+  return utilFormatDateShort(date, locale);
 }
 
 /** Returns { activated: bool, activationDate: Date, daysLeft: number } */
@@ -393,7 +384,7 @@ const InvestmentsPage = () => {
         headers: getAuthHeaders(),
       });
       const all = res.data?.data || [];
-      const approved = all.filter((c) => c.status === 'approved');
+      const approved = all.filter((c) => c.status === 'approved' && c.type === 'rental');
       setContracts(approved);
     } catch (err) {
       console.error('Failed to load contracts', err);
@@ -410,7 +401,7 @@ const InvestmentsPage = () => {
 
   const stats = useMemo(() => {
     const count = contracts.length;
-    const totalValue = contracts.reduce((s, c) => s + (Number(c.total_amount) || 0), 0);
+    const totalValue = count*12*660;
     const activatedCount = contracts.filter((c) => getActivationInfo(c.approved_at).activated).length;
     return { count, totalValue, activatedCount };
   }, [contracts]);

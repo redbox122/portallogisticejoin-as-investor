@@ -2,17 +2,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Watch } from 'react-loader-spinner';
 import { getAnalyticsSummary, getAnalyticsPayments } from '../../api/dashboardApi';
+import { formatNumber, formatDate as utilFormatDate } from '../../utils/formatters';
 import '../../Css/pages/analytics-page.css';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-function fmtSAR(n) {
-  return Number(n || 0).toLocaleString('ar-SA');
+function fmtSAR(n, locale = 'en') {
+  const num = formatNumber(n, locale);
+  return locale === 'ar' ? `${num} ر.س` : `${num} SAR`;
 }
 
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+function fmtDate(d, locale = 'en') {
+  return utilFormatDate(d, locale);
 }
 
 // ── static fallback ───────────────────────────────────────────────────────────
@@ -85,6 +86,7 @@ function BarChart({ data, isAr }) {
 const AnalyticsPage = () => {
   const { i18n } = useTranslation(['common']);
   const isAr = i18n.language === 'ar';
+  const locale = isAr ? 'ar' : 'en';
 
   const [summary, setSummary]   = useState(null);
   const [monthly, setMonthly]   = useState(null);
@@ -129,50 +131,50 @@ const AnalyticsPage = () => {
     return (
       <div className="an-center">
         <Watch height="52" width="52" radius="9" color="#073491" ariaLabel="loading" />
-        <p className="an-loading-text">جاري تحميل التحليلات...</p>
+        <p className="an-loading-text">{isAr ? 'جاري تحميل التحليلات...' : 'Loading analytics...'}</p>
       </div>
     );
   }
 
   return (
-    <div className="an-page" dir="rtl">
+    <div className="an-page" dir={isAr ? 'rtl' : 'ltr'}>
 
       {/* header */}
       <div className="an-header">
         <h1 className="an-title">
-          <i className="fas fa-chart-bar" aria-hidden="true"></i> التحليلات
+          <i className="fas fa-chart-bar" aria-hidden="true"></i> {isAr ? 'التحليلات' : 'Analytics'}
         </h1>
-        <p className="an-subtitle">نظرة شاملة على أداء استثماراتك وحركة الدفعات</p>
+        <p className="an-subtitle">{isAr ? 'نظرة شاملة على أداء استثماراتك وحركة الدفعات' : 'Comprehensive overview of your investments and payment activity'}</p>
       </div>
 
       {/* KPI row */}
       <div className="an-kpi-grid">
         <KpiCard
           icon="fa-wallet"
-          label="إجمالي الاستثمار"
-          value={`${fmtSAR(s.total_invested)} ر.س`}
-          sub={`${s.total_contracts} عقد`}
+          label={isAr ? 'إجمالي الاستثمار' : 'Total Investment'}
+          value={`${fmtSAR(s.total_invested, locale)}`}
+          sub={isAr ? `${s.total_contracts} عقد` : `${s.total_contracts} contracts`}
           accent="blue"
         />
         <KpiCard
           icon="fa-money-bill-wave"
-          label="إجمالي المُستلَم"
-          value={`${fmtSAR(s.total_received)} ر.س`}
-          sub={`نسبة الإنجاز ${s.completion_rate}%`}
+          label={isAr ? 'إجمالي المُستلَم' : 'Total Received'}
+          value={`${fmtSAR(s.total_received, locale)}`}
+          sub={isAr ? `نسبة الإنجاز ${s.completion_rate}%` : `Completion ${s.completion_rate}%`}
           accent="green"
         />
         <KpiCard
           icon="fa-clock"
-          label="المبالغ المعلقة"
-          value={`${fmtSAR(s.pending_payments)} ر.س`}
-          sub={`${s.active_contracts} عقد نشط`}
+          label={isAr ? 'المبالغ المعلقة' : 'Pending Amounts'}
+          value={`${fmtSAR(s.pending_payments, locale)}`}
+          sub={isAr ? `${s.active_contracts} عقد نشط` : `${s.active_contracts} active contracts`}
           accent="amber"
         />
         <KpiCard
           icon="fa-file-contract"
-          label="العقود"
+          label={isAr ? 'العقود' : 'Contracts'}
           value={s.total_contracts}
-          sub={s.pending_contracts > 0 ? `${s.pending_contracts} قيد المراجعة` : 'جميعها معتمدة'}
+          sub={s.pending_contracts > 0 ? (isAr ? `${s.pending_contracts} قيد المراجعة` : `${s.pending_contracts} pending`) : (isAr ? 'جميعها معتمدة' : 'all approved')}
           accent="teal"
         />
       </div>
@@ -183,11 +185,11 @@ const AnalyticsPage = () => {
         {/* completion rate */}
         <div className="an-card an-completion-card">
           <h2 className="an-card-title">
-            <i className="fas fa-circle-check" aria-hidden="true"></i> نسبة الإنجاز
+            <i className="fas fa-circle-check" aria-hidden="true"></i> {isAr ? 'نسبة الإنجاز' : 'Completion Rate'}
           </h2>
           <div className="an-completion-bar-wrap">
             <div className="an-completion-row">
-              <span>المُستلَم</span>
+              <span>{isAr ? 'المُستلَم' : 'Received'}</span>
               <strong>{s.completion_rate}%</strong>
             </div>
             <div className="an-completion-bar">
@@ -196,7 +198,7 @@ const AnalyticsPage = () => {
           </div>
           <div className="an-completion-bar-wrap">
             <div className="an-completion-row">
-              <span>المعلق</span>
+              <span>{isAr ? 'المعلق' : 'Pending'}</span>
               <strong>{(100 - s.completion_rate).toFixed(1)}%</strong>
             </div>
             <div className="an-completion-bar">
@@ -206,13 +208,13 @@ const AnalyticsPage = () => {
           <div className="an-totals">
             <div className="an-total-item">
               <span className="an-total-dot" style={{ background: '#10b981' }}></span>
-              <span>مُستلَم</span>
-              <strong>{fmtSAR(s.total_received)} ر.س</strong>
+              <span>{isAr ? 'مُستلَم' : 'Received'}</span>
+              <strong>{fmtSAR(s.total_received, locale)}</strong>
             </div>
             <div className="an-total-item">
               <span className="an-total-dot" style={{ background: '#f59e0b' }}></span>
-              <span>معلق</span>
-              <strong>{fmtSAR(s.pending_payments)} ر.س</strong>
+              <span>{isAr ? 'معلق' : 'Pending'}</span>
+              <strong>{fmtSAR(s.pending_payments, locale)}</strong>
             </div>
           </div>
         </div>
@@ -220,25 +222,25 @@ const AnalyticsPage = () => {
         {/* next payment */}
         <div className="an-card an-next-card">
           <h2 className="an-card-title">
-            <i className="fas fa-calendar-check" aria-hidden="true"></i> الدفعة القادمة
+            <i className="fas fa-calendar-check" aria-hidden="true"></i> {isAr ? 'الدفعة القادمة' : 'Next Payment'}
           </h2>
           {next ? (
             <div className="an-next-body">
               <div className={`an-next-amount${isOverdue ? ' an-next--overdue' : isUrgent ? ' an-next--urgent' : ''}`}>
-                {fmtSAR(next.amount)} <span className="an-next-currency">ر.س</span>
+                {fmtSAR(next.amount, locale)} <span className="an-next-currency">{locale === 'ar' ? 'ر.س' : 'SAR'}</span>
               </div>
               <div className="an-next-date">
                 <i className="fas fa-calendar-alt" aria-hidden="true"></i>
-                {fmtDate(next.due_date)}
+                {fmtDate(next.due_date, locale)}
               </div>
               <div className={`an-next-chip${isOverdue ? ' an-chip--overdue' : isUrgent ? ' an-chip--urgent' : ' an-chip--ok'}`}>
-                {isOverdue ? `متأخرة بـ ${Math.abs(daysLeft)} يوم` : daysLeft === 0 ? 'اليوم' : `بعد ${daysLeft} يوم`}
+                {isOverdue ? (isAr ? `متأخرة بـ ${Math.abs(daysLeft)} يوم` : `Overdue by ${Math.abs(daysLeft)} days`) : daysLeft === 0 ? (isAr ? 'اليوم' : 'Today') : (isAr ? `بعد ${daysLeft} يوم` : `In ${daysLeft} days`)}
               </div>
             </div>
           ) : (
             <div className="an-next-empty">
               <i className="fas fa-circle-check" aria-hidden="true"></i>
-              <p>لا توجد دفعات قادمة</p>
+              <p>{isAr ? 'لا توجد دفعات قادمة' : 'No upcoming payments'}</p>
             </div>
           )}
         </div>
@@ -250,22 +252,22 @@ const AnalyticsPage = () => {
         <div className="an-chart-head">
           <div>
             <h2 className="an-card-title" style={{ margin: 0 }}>
-              <i className="fas fa-chart-column" aria-hidden="true"></i> حركة الدفعات الشهرية
+              <i className="fas fa-chart-column" aria-hidden="true"></i> {isAr ? 'حركة الدفعات الشهرية' : 'Monthly Payment Activity'}
             </h2>
             <p className="an-chart-year">{new Date().getFullYear()}</p>
           </div>
           <div className="an-chart-legend">
             <span className="an-legend-item">
               <span className="an-legend-dot" style={{ background: '#10b981' }}></span>
-              مُستلَم — {fmtSAR(totalReceivedChart)} ر.س
+              {isAr ? 'مُستلَم' : 'Received'} — {fmtSAR(totalReceivedChart, locale)}
             </span>
             <span className="an-legend-item">
               <span className="an-legend-dot" style={{ background: '#e5e7eb' }}></span>
-              معلق — {fmtSAR(totalPendingChart)} ر.س
+              {isAr ? 'معلق' : 'Pending'} — {fmtSAR(totalPendingChart, locale)}
             </span>
           </div>
         </div>
-        <BarChart data={md} isAr={isAr} />
+        <BarChart data={md} isAr={isAr} locale={locale} />
       </div>
 
     </div>

@@ -8,6 +8,7 @@ import { Store } from 'react-notifications-component';
 import LanguageSwitcher from '../CustomComponents/LanguageSwitcher';
 import { API_BASE_URL } from '../config';
 import '../Css/login.css';
+import DashboardFooter from '../Components/DashboardFooter';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ login: '', password: '' });
@@ -490,9 +491,10 @@ const LoginPage = () => {
           </form>
         )}
 
-        <div className="login-footer">
+        {/* <div className="login-footer">
           <LanguageSwitcher />
-        </div>
+        </div> */}
+        <DashboardFooter/>
       </div>
     </div>
   );

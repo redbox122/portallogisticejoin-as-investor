@@ -7,7 +7,7 @@ import '../Css/admin-sidebar.css';
 const UserSidebar = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { i18n } = useTranslation(['common']);
+  const { i18n, t } = useTranslation(['common']);
   const { logout } = useAuth();
   const [isRTL, setIsRTL] = useState(false);
 
@@ -16,24 +16,18 @@ const UserSidebar = ({ isOpen, onToggle }) => {
   }, [i18n.language]);
 
   const menuItems = [
-    { id: 'home', path: '/dashboard', icon: 'fa-home', label: 'الرئيسية', exact: true },
-    { id: 'investments', path: '/dashboard/investments', icon: 'fa-piggy-bank', label: 'استثماراتي' },
-    { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', label: 'العقود' },
-    { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', label: 'الأرباح' },
-    { id: 'profile', path: '/dashboard/profile', icon: 'fa-user', label: 'الملف الشخصي' },
-    { id: 'logout', path: '/logout', icon: 'fa-sign-out-alt', label: 'تسجيل الخروج' },
+    { id: 'home', path: '/dashboard', icon: 'fa-home', labelAr: 'الرئيسية', labelEn: 'Overview' },
+    { id: 'investments', path: '/dashboard/investments', icon: 'fa-piggy-bank', labelAr: 'استثماراتي', labelEn: 'Investments' },
+    { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', labelAr: 'العقود', labelEn: 'Contracts' },
+    { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', labelAr: 'الأرباح', labelEn: 'Analytics' },
+    { id: 'profile', path: '/dashboard/profile', icon: 'fa-user', labelAr: 'الملف الشخصي', labelEn: 'Profile' },
+    { id: 'logout', path: '/logout', icon: 'fa-sign-out-alt', labelAr: 'تسجيل الخروج', labelEn: 'Logout' },
   ];
 
   const isActive = (item) => {
-    // if (item.id === 'home') {
-    //   const isInvest = location.search.includes('section=investments');
-    //   return location.pathname === '/dashboard' && !isInvest;
-    // }
-
-    // if (item.id === 'investments') {
-    //   return location.pathname === '/dashboard' && location.search.includes('section=investments');
-    // }
-
+    if(item.id === 'home') {
+      return location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+    }
     return item.exact ? location.pathname === item.path : location.pathname === item.path || location.pathname.startsWith(item.path);
   };
 
@@ -58,14 +52,14 @@ const UserSidebar = ({ isOpen, onToggle }) => {
         <div className="admin-sidebar-header">
           <div className="admin-sidebar-logo">
             <img src="/assets/images/logo.png" alt="Logo" />
-            <h2>لوحة المستخدم</h2>
+            <h2>{isRTL ? 'لوحة المستخدم' : 'Dashboard'}</h2>
           </div>
           <button className="admin-sidebar-close-btn" onClick={onToggle} type="button">
             <i className="fas fa-times" />
           </button>
         </div>
 
-        <nav className="admin-sidebar-nav" id="dashboard-sidebar-nav" aria-label="لوحة التنقل">
+        <nav className="admin-sidebar-nav" id="dashboard-sidebar-nav" aria-label={isRTL ? 'لوحة التنقل' : 'Navigation'}>
           <ul className="admin-nav-menu">
             {menuItems.map((item) => (
               <li key={item.id} className="admin-nav-item">
@@ -82,7 +76,7 @@ const UserSidebar = ({ isOpen, onToggle }) => {
                 >
                   <div className="admin-nav-link-content">
                     <i className={`fas ${item.icon}`} />
-                    <span>{item.label}</span>
+                    <span>{isRTL ? item.labelAr : item.labelEn}</span>
                   </div>
                   {isActive(item) && <div className="admin-active-indicator" />}
                 </button>

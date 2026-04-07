@@ -18,7 +18,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
   const isRTL = i18n.language === 'ar';
-
+  
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -104,7 +104,7 @@ const ProfilePage = () => {
   const iban = profile?.iban ?? '—';
   const bankName = profile?.bank_name ?? '—';
   const region = profile?.region ?? '—';
-  const fullName = profile?.full_name || [profile?.first_name, lastName].filter(Boolean).join(' ').trim() || '—';
+  const fullName = profile?.full_name || [profile?.first_name,fatherName,grandfatherName, lastName].filter(Boolean).join(' ').trim() || '—';
   const email = profile?.email ?? '—';
   const phone = profile?.phone ?? profile?.phone_number ?? '—';
   const nationalId = profile?.national_id ?? '—';

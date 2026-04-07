@@ -221,3 +221,248 @@
   .an-bar-chart { height: 130px; }
   .an-bar-label { font-size: 9px; }
 }
+/* ── Dark Mode ─────────────────────────────────────────────────────────────── */
+
+html.dark .an-page {
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+html.dark .an-title {
+  color: #f0f4f8;
+}
+
+html.dark .an-title i {
+  color: #60a5fa;
+}
+
+html.dark .an-subtitle {
+  color: #a0aec0;
+}
+
+html.dark .an-kpi {
+  background: rgba(17, 24, 39, 0.5);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark .an-kpi--blue  { background: rgba(30, 58, 138, 0.3); border-color: rgba(37, 99, 235, 0.3); }
+html.dark .an-kpi--green { background: rgba(6, 78, 59, 0.3); border-color: rgba(16, 185, 129, 0.3); }
+html.dark .an-kpi--amber { background: rgba(78, 22, 6, 0.3); border-color: rgba(245, 158, 11, 0.3); }
+html.dark .an-kpi--teal  { background: rgba(12, 74, 110, 0.3); border-color: rgba(20, 184, 166, 0.3); }
+
+html.dark .an-kpi--blue  .an-kpi-icon { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+html.dark .an-kpi--green .an-kpi-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+html.dark .an-kpi--amber .an-kpi-icon { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+html.dark .an-kpi--teal  .an-kpi-icon { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; }
+
+html.dark .an-kpi-value { color: #f0f4f8; }
+html.dark .an-kpi-label { color: #a0aec0; }
+html.dark .an-kpi-sub { color: #6b7280; }
+
+html.dark .an-card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark .an-card-title {
+  color: #f0f4f8;
+}
+
+html.dark .an-card-title i {
+  color: #60a5fa;
+}
+
+html.dark .an-completion-row {
+  color: #cbd5e1;
+}
+
+html.dark .an-completion-row strong {
+  color: #f0f4f8;
+}
+
+html.dark .an-completion-bar {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+html.dark .an-total-item {
+  color: #cbd5e1;
+}
+
+html.dark .an-total-item strong {
+  color: #f0f4f8;
+}
+
+html.dark .an-next-amount {
+  color: #60a5fa;
+}
+
+html.dark .an-next--overdue {
+  color: #f87171;
+}
+
+html.dark .an-next--urgent {
+  color: #fb923c;
+}
+
+html.dark .an-next-date {
+  color: #a0aec0;
+}
+
+html.dark .an-next-empty {
+  color: #34d399;
+}
+
+html.dark .an-next-empty p {
+  color: #a0aec0;
+}
+
+html.dark .an-chart-year {
+  color: #6b7280;
+}
+
+html.dark .an-legend-item {
+  color: #cbd5e1;
+}
+
+html.dark .an-loading-text {
+  color: #60a5fa;
+}
+
+html.dark .an-bar-tooltip {
+  background: #1f2937;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+html.dark .an-bar-col--current .an-bar-label {
+  color: #60a5fa;
+}
+
+html.dark .an-bar-label {
+  color: #6b7280;
+}
+
+/* ── Enhanced Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .an-page {
+    padding: 20px 16px;
+  }
+  
+  .an-mid-grid {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .an-kpi-grid { 
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .an-mid-grid { 
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  
+  .an-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .an-page {
+    padding: 16px 12px;
+    max-width: 100%;
+  }
+
+  .an-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .an-kpi {
+    padding: 16px;
+  }
+
+  .an-kpi-value { font-size: 18px; }
+  .an-kpi-label { font-size: 12px; }
+
+  .an-title { font-size: 18px; }
+  .an-subtitle { font-size: 13px; }
+
+  .an-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .an-card-title { font-size: 14px; }
+
+  .an-chart-head {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .an-chart-legend {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .an-legend-item {
+    font-size: 12px;
+  }
+
+  .an-next-amount { font-size: 26px; }
+
+  .an-next-currency { font-size: 14px; }
+
+  .an-completion-row {
+    font-size: 12px;
+  }
+
+  .an-bar-chart {
+    height: 150px;
+    padding-bottom: 32px;
+  }
+
+  .an-bar-label { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .an-page {
+    padding: 12px 8px;
+  }
+
+  .an-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .an-card {
+    padding: 14px;
+  }
+
+  .an-title { font-size: 16px; }
+  .an-subtitle { font-size: 12px; }
+
+  .an-kpi-value { font-size: 16px; }
+
+  .an-card-title { font-size: 13px; }
+
+  .an-next-amount { font-size: 22px; }
+
+  .an-bar-chart { height: 130px; }
+  .an-bar-label { font-size: 9px; }
+
+  .an-completion-bar {
+    height: 8px;
+  }
+
+  .an-completion-row {
+    font-size: 11px;
+  }
+
+  .an-total-item {
+    font-size: 12px;
+  }
+}

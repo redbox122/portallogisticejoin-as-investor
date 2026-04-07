@@ -3,18 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { Watch } from 'react-loader-spinner';
 import { getDashboardData } from '../../api/dashboardApi';
 import ProfileCompletionModal from '../../Components/ProfileCompletionModal';
+import { formatNumber, formatDate as utilFormatDate, formatPercent } from '../../utils/formatters';
 import '../../Css/pages/overview-page.css';
 import { Store } from 'react-notifications-component';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
-function fmtSAR(n) {
-  return Number(n || 0).toLocaleString('ar-SA');
+function fmtSAR(n, locale = 'en') {
+  const num = formatNumber(n, locale);
+  return locale === 'ar' ? `${num} ر.س` : `${num} SAR`;
 }
 
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+function fmtDate(d, locale = 'en') {
+  return utilFormatDate(d, locale);
 }
 
 function clamp(v, lo, hi) {
@@ -83,8 +84,9 @@ function KpiCard({ icon, label, value, sub, accent, sparkData }) {
 // ── OverviewPage ──────────────────────────────────────────────────────────────
 
 const OverviewPage = () => {
-  const { i18n,t } = useTranslation(['common']);
+  const { i18n, t } = useTranslation(['common']);
   const isAr = i18n.language === 'ar';
+  const locale = isAr ? 'ar' : 'en';
  
   const [data, setData]             = useState(null);
   const [loading, setLoading]       = useState(true);
@@ -98,7 +100,7 @@ const OverviewPage = () => {
     setLoading(true);
     setError('');
     const token = localStorage.getItem('portal_logistics_token');
-    if (!token) { setLoading(false); setError('غير مسجّل'); return; }
+    if (!token) { setLoading(false); setError(isAr ? 'غير مسجّل' : 'Not logged in'); return; }
     try {
       const res = await getDashboardData(token);
       if (res?.data?.success && res?.data?.data) {
@@ -113,7 +115,7 @@ const OverviewPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [skipProfile]);
+  }, [skipProfile, isAr]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -145,21 +147,21 @@ const OverviewPage = () => {
     return (
       <div className="ov-center">
         <Watch height="52" width="52" radius="9" color="#073491" ariaLabel="loading" />
-        <p className="ov-loading-text">جاري التحميل...</p>
+        <p className="ov-loading-text">{isAr ? 'جاري التحميل...' : 'Loading...'}</p>
       </div>
     );
   }
 
   return (
-    <div className="ov-page" dir="rtl">
+    <div className="ov-page" dir={isAr ? 'rtl' : 'ltr'}>
 
       {/* greeting */}
       <div className="ov-greeting">
         <div>
           <h1 className="ov-greeting-title">
-            مرحباً{user.first_name ? `، ${user.first_name}` : ''} 👋
+            {isAr ? `مرحباً${user.first_name ? `، ${user.first_name}` : ''} 👋` : `Hello${user.first_name ? ` ${user.first_name}` : ''} 👋`}
           </h1>
-          <p className="ov-greeting-sub">إليك ملخص استثماراتك اليوم</p>
+          <p className="ov-greeting-sub">{isAr ? 'إليك ملخص استثماراتك اليوم' : 'Here\'s a summary of your investments today'}</p>
         </div>
         {error && <span className="ov-error-chip"><i className="fas fa-triangle-exclamation"></i> {error}</span>}
       </div>
@@ -168,31 +170,31 @@ const OverviewPage = () => {
       <div className="ov-kpi-grid">
         <KpiCard
           icon="fa-wallet"
-          label="إجمالي الاستثمار"
-          value={`${fmtSAR(inv.total)} ر.س`}
-          sub={`${cs.approved || 0} عقد معتمد`}
+          label={isAr ? 'إجمالي الاستثمار' : 'Total Investment'}
+          value={`${fmtSAR(inv.total, locale)}`}
+          sub={isAr ? `${cs.approved || 0} عقد معتمد` : `${cs.approved || 0} approved contracts`}
           accent="blue"
         />
         <KpiCard
           icon="fa-money-bill-wave"
-          label="إجمالي المُستلَم"
-          value={`${fmtSAR(inv.totalReceived)} ر.س`}
-          sub={`${ps.received} دفعة مكتملة`}
+          label={isAr ? 'إجمالي المُستلَم' : 'Total Received'}
+          value={`${fmtSAR(inv.totalReceived, locale)}`}
+          sub={isAr ? `${ps.received} دفعة مكتملة` : `${ps.received} completed payments`}
           accent="green"
           sparkData={sparkReceived}
         />
         <KpiCard
           icon="fa-clock"
-          label="المبلغ المتبقي"
-          value={`${fmtSAR(inv.totalPending)} ر.س`}
-          sub={`${ps.pending} دفعة قادمة`}
+          label={isAr ? 'المبلغ المتبقي' : 'Remaining Amount'}
+          value={`${fmtSAR(inv.totalPending, locale)}`}
+          sub={isAr ? `${ps.pending} دفعة قادمة` : `${ps.pending} pending payments`}
           accent="amber"
         />
         <KpiCard
           icon="fa-file-contract"
-          label="العقود النشطة"
+          label={isAr ? 'العقود النشطة' : 'Active Contracts'}
           value={cs.activated ?? cs.approved ?? 0}
-          sub={cs.pending > 0 ? `${cs.pending} قيد المراجعة` : 'جميعها مكتملة'}
+          sub={cs.pending > 0 ? (isAr ? `${cs.pending} قيد المراجعة` : `${cs.pending} under review`) : (isAr ? 'جميعها مكتملة' : 'all completed')}
           accent="teal"
         />
       </div>
@@ -203,31 +205,31 @@ const OverviewPage = () => {
         {/* investment progress */}
         <div className="ov-card ov-progress-card">
           <h2 className="ov-card-title">
-            <i className="fas fa-chart-pie" aria-hidden="true"></i> تقدم الاستثمار
+            <i className="fas fa-chart-pie" aria-hidden="true"></i> {isAr ? 'تقدم الاستثمار' : 'Investment Progress'}
           </h2>
           <div className="ov-progress-body">
             <div className="ov-ring-wrap">
               <ProgressRing pct={completionPct} size={110} stroke={10} color="#2563eb" />
               <div className="ov-ring-center">
                 <span className="ov-ring-pct">{completionPct}%</span>
-                <span className="ov-ring-label">مُستلَم</span>
+                <span className="ov-ring-label">{isAr ? 'مُستلَم' : 'Received'}</span>
               </div>
             </div>
             <div className="ov-progress-stats">
               <div className="ov-pstat">
                 <span className="ov-pstat-dot" style={{ background: '#2563eb' }}></span>
-                <span className="ov-pstat-label">إجمالي الاستثمار</span>
-                <strong>{fmtSAR(inv.total)} ر.س</strong>
+                <span className="ov-pstat-label">{isAr ? 'إجمالي الاستثمار' : 'Total Investment'}</span>
+                <strong>{fmtSAR(inv.total, locale)}</strong>
               </div>
               <div className="ov-pstat">
                 <span className="ov-pstat-dot" style={{ background: '#10b981' }}></span>
-                <span className="ov-pstat-label">المُستلَم</span>
-                <strong style={{ color: '#10b981' }}>{fmtSAR(inv.totalReceived)} ر.س</strong>
+                <span className="ov-pstat-label">{isAr ? 'المُستلَم' : 'Received'}</span>
+                <strong style={{ color: '#10b981' }}>{fmtSAR(inv.totalReceived, locale)}</strong>
               </div>
               <div className="ov-pstat">
                 <span className="ov-pstat-dot" style={{ background: '#f59e0b' }}></span>
-                <span className="ov-pstat-label">المتبقي</span>
-                <strong style={{ color: '#f59e0b' }}>{fmtSAR(inv.totalPending)} ر.س</strong>
+                <span className="ov-pstat-label">{isAr ? 'المتبقي' : 'Remaining'}</span>
+                <strong style={{ color: '#f59e0b' }}>{fmtSAR(inv.totalPending, locale)}</strong>
               </div>
             </div>
           </div>
@@ -235,7 +237,7 @@ const OverviewPage = () => {
           {/* payment progress bar */}
           <div className="ov-pay-bar-wrap">
             <div className="ov-pay-bar-labels">
-              <span>الدفعات المكتملة</span>
+              <span>{isAr ? 'الدفعات المكتملة' : 'Completed Payments'}</span>
               <span>{ps.received} / {ps.total}</span>
             </div>
             <div className="ov-pay-bar">
@@ -247,52 +249,52 @@ const OverviewPage = () => {
         {/* next payment */}
         <div className="ov-card ov-next-card">
           <h2 className="ov-card-title">
-            <i className="fas fa-calendar-check" aria-hidden="true"></i> الدفعة القادمة
+            <i className="fas fa-calendar-check" aria-hidden="true"></i> {isAr ? 'الدفعة القادمة' : 'Next Payment'}
           </h2>
           {next ? (
             <div className="ov-next-body">
               <div className={`ov-next-amount${isOverdue ? ' ov-next-amount--overdue' : isUrgent ? ' ov-next-amount--urgent' : ''}`}>
-                {fmtSAR(next.amount)} <span className="ov-next-currency">ر.س</span>
+                {fmtSAR(next.amount, locale)} 
               </div>
               <div className="ov-next-date">
                 <i className="fas fa-calendar-alt" aria-hidden="true"></i>
-                {fmtDate(next.due_date)}
+                {fmtDate(next.due_date, locale)}
               </div>
               <div className={`ov-next-chip${isOverdue ? ' ov-chip--overdue' : isUrgent ? ' ov-chip--urgent' : ' ov-chip--ok'}`}>
                 {isOverdue
-                  ? `متأخرة بـ ${Math.abs(daysLeft)} يوم`
+                  ? isAr ? `متأخرة بـ ${Math.abs(daysLeft)} يوم` : `Overdue by ${Math.abs(daysLeft)} days`
                   : daysLeft === 0
-                  ? 'اليوم'
-                  : `بعد ${daysLeft} يوم`
+                  ? isAr ? 'اليوم' : 'Today'
+                  : isAr ? `بعد ${daysLeft} يوم` : `In ${daysLeft} days`
                 }
               </div>
             </div>
           ) : (
             <div className="ov-next-empty">
               <i className="fas fa-circle-check" aria-hidden="true"></i>
-              <p>لا توجد دفعات قادمة</p>
+              <p>{isAr ? 'لا توجد دفعات قادمة' : 'No upcoming payments'}</p>
             </div>
           )}
 
           {/* contracts breakdown */}
           <div className="ov-contracts-breakdown">
-            <h3 className="ov-breakdown-title">ملخص العقود</h3>
+            <h3 className="ov-breakdown-title">{isAr ? 'ملخص العقود' : 'Contracts Summary'}</h3>
             <div className="ov-breakdown-grid">
               <div className="ov-breakdown-item">
                 <span className="ov-breakdown-num">{cs.total ?? 0}</span>
-                <span className="ov-breakdown-lbl">الإجمالي</span>
+                <span className="ov-breakdown-lbl">{isAr ? 'الإجمالي' : 'Total'}</span>
               </div>
               <div className="ov-breakdown-item ov-breakdown-item--green">
                 <span className="ov-breakdown-num">{cs.approved ?? 0}</span>
-                <span className="ov-breakdown-lbl">معتمدة</span>
+                <span className="ov-breakdown-lbl">{isAr ? 'معتمدة' : 'Approved'}</span>
               </div>
               <div className="ov-breakdown-item ov-breakdown-item--amber">
                 <span className="ov-breakdown-num">{cs.pending ?? 0}</span>
-                <span className="ov-breakdown-lbl">قيد المراجعة</span>
+                <span className="ov-breakdown-lbl">{isAr ? 'قيد المراجعة' : 'Pending'}</span>
               </div>
               <div className="ov-breakdown-item ov-breakdown-item--blue">
                 <span className="ov-breakdown-num">{cs.activated ?? 0}</span>
-                <span className="ov-breakdown-lbl">مُفعَّلة</span>
+                <span className="ov-breakdown-lbl">{isAr ? 'مُفعَّلة' : 'Active'}</span>
               </div>
             </div>
           </div>
@@ -307,13 +309,13 @@ const OverviewPage = () => {
             <div className="ov-monthly-info">
               <i className="fas fa-arrows-rotate ov-monthly-icon" aria-hidden="true"></i>
               <div>
-                <p className="ov-monthly-label">الدفعة الشهرية الإجمالية</p>
-                <p className="ov-monthly-amount">{fmtSAR(inv.monthlyDeposit)} ر.س / شهر</p>
+                <p className="ov-monthly-label">{isAr ? 'الدفعة الشهرية الإجمالية' : 'Total Monthly Payment'}</p>
+                <p className="ov-monthly-amount">{fmtSAR(inv.monthlyDeposit, locale)} / {isAr ? 'شهر' : 'mo'}</p>
               </div>
             </div>
             <div className="ov-monthly-months">
               <span className="ov-months-num">{inv.monthsPassed}</span>
-              <span className="ov-months-label">شهر مكتمل من 12</span>
+              <span className="ov-months-label">{isAr ? 'شهر مكتمل من 12' : 'months of 12 completed'}</span>
             </div>
           </div>
         </div>
