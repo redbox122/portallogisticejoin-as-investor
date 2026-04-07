@@ -332,6 +332,27 @@
 .profile-completion-form .form-group select.input-error {
   border-color: #dc3545;
 }
+.profile-completion-form .birth-date-gregorian-note {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6f6f6f;
+  font-weight: 500;
+}
+.profile-completion-form .birth-date-hijri-equivalent {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #073491;
+  font-weight: 600;
+}
+.profile-completion-form .birth-date-hijri-label {
+  font-weight: 600;
+  color: #1c1c1c;
+}
+.profile-completion-form .birth-date-hijri-value {
+  font-weight: 700;
+}
 
 .profile-completion-form .form-group .error-message {
   color: #dc3545;

@@ -21,6 +21,7 @@ const LoginPage = () => {
   const [createAdminForm, setCreateAdminForm] = useState({ email: '', password: '', name: '' });
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetForm, setResetForm] = useState({ password: '', password_confirmation: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const { t, i18n } = useTranslation(['common']);
   const { login, isAuthenticated, userType, resetPassword } = useAuth();
   const navigate = useNavigate();
@@ -305,17 +306,32 @@ const LoginPage = () => {
 
           <div className="form-group">
             <label htmlFor="password">{t('login.password')}</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={loginData.password}
-              onChange={handleInputChange}
-              placeholder={t('login.password_placeholder')}
-              className="form-control"
-              disabled={loading}
-              autoComplete="current-password"
-            />
+            <div className="login-password-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={loginData.password}
+                onChange={handleInputChange}
+                placeholder={t('login.password_placeholder')}
+                className="form-control login-password-input"
+                disabled={loading}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
+                aria-pressed={showPassword}
+                disabled={loading}
+              >
+                <i
+                  className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
           </div>
 
           {error && (

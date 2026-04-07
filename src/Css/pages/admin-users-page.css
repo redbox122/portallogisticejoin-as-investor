@@ -146,3 +146,348 @@
     align-items: stretch;
   }
 }
+
+/* —— Nested users routes: list actions + detail/update —— */
+.admin-users-section {
+  min-height: 0;
+}
+
+.users-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.users-actions-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+  max-width: 320px;
+}
+
+[dir='rtl'] .users-actions-cell {
+  justify-content: flex-end;
+}
+
+.action-btn--primary {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.action-btn--secondary {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+}
+
+.action-btn--danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.action-btn--success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.admin-user-detail-page,
+.admin-user-update-page {
+  padding: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-user-detail-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-user-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #334155;
+}
+
+.admin-user-detail-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-user-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.admin-user-detail-btn--secondary {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.admin-user-detail-btn--danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.admin-user-detail-btn--success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.admin-user-update-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-user-update-title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #0f172a;
+}
+
+.admin-user-update-subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.admin-user-update-form {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.admin-user-field-readonly {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.admin-user-iban-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  direction: ltr;
+}
+
+.admin-user-iban-prefix {
+  position: absolute;
+  left: 12px;
+  color: #64748b;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.admin-user-iban-wrap input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.form-hint-muted {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.admin-user-active-row {
+  display: flex;
+  align-items: flex-end;
+}
+
+.admin-user-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.admin-user-update-actions {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, #fff 70%, transparent);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+/* Status confirm modal */
+.admin-user-status-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.admin-user-status-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(15, 23, 42, 0.45);
+  cursor: pointer;
+}
+
+.admin-user-status-modal-panel {
+  position: relative;
+  width: min(420px, 100%);
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 20px 18px;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.2);
+  text-align: center;
+}
+
+.admin-user-status-modal-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.admin-user-status-modal-icon--warn {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.admin-user-status-modal-icon--danger {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.admin-user-status-modal-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.admin-user-status-modal-text {
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.admin-user-status-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.admin-user-status-btn {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.admin-user-status-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.admin-user-status-btn--ghost {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+.admin-user-status-btn--primary {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+}
+
+.admin-user-status-btn--danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+}
+
+[data-admin-theme='dark'] .users-create-card,
+[data-admin-theme='dark'] .users-table-card,
+[data-admin-theme='dark'] .admin-user-update-form,
+[data-admin-theme='dark'] .admin-user-status-modal-panel {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-admin-theme='dark'] .admin-user-update-title,
+[data-admin-theme='dark'] .admin-user-status-modal-title {
+  color: #f1f5f9;
+}
+
+[data-admin-theme='dark'] .admin-user-update-subtitle,
+[data-admin-theme='dark'] .admin-user-status-modal-text,
+[data-admin-theme='dark'] .form-hint-muted {
+  color: #94a3b8;
+}
+
+[data-admin-theme='dark'] .admin-user-detail-back,
+[data-admin-theme='dark'] .action-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-admin-theme='dark'] .action-btn--primary {
+  background: #1e3a5f;
+  border-color: #2563eb;
+  color: #93c5fd;
+}
+
+[data-admin-theme='dark'] .users-table th {
+  background: #0f172a;
+  color: #94a3b8;
+}
+
+[data-admin-theme='dark'] .users-table td {
+  border-bottom-color: #334155;
+}

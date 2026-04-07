@@ -4,6 +4,7 @@ import { Watch } from 'react-loader-spinner';
 import { getDashboardData } from '../../api/dashboardApi';
 import ProfileCompletionModal from '../../Components/ProfileCompletionModal';
 import '../../Css/pages/overview-page.css';
+import { Store } from 'react-notifications-component';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -82,9 +83,9 @@ function KpiCard({ icon, label, value, sub, accent, sparkData }) {
 // ── OverviewPage ──────────────────────────────────────────────────────────────
 
 const OverviewPage = () => {
-  const { i18n } = useTranslation(['common']);
+  const { i18n,t } = useTranslation(['common']);
   const isAr = i18n.language === 'ar';
-
+ 
   const [data, setData]             = useState(null);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState('');

@@ -1,0 +1,195 @@
+/* User dashboard footer — partner logos strip */
+
+.dashboard-footer {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding: 20px 24px 22px;
+  border-top: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.65) 0%, #f1f5f9 48%, #eef2f7 100%);
+  overflow: hidden;
+}
+
+.dashboard-footer__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 120px;
+  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(37, 99, 235, 0.09), transparent 72%);
+  opacity: 1;
+}
+
+.dashboard-footer__inner {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-footer__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.dashboard-footer__eyebrow {
+  width: 36px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #2563eb, #38bdf8, transparent);
+  opacity: 0.85;
+}
+
+.dashboard-footer__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+  font-family: "Cairo", sans-serif;
+}
+
+.dashboard-footer__logos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 14px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .dashboard-footer__logos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .dashboard-footer__logos {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+.dashboard-footer__logo-item {
+  margin: 0;
+  min-width: 0;
+}
+
+.dashboard-footer__logo-card {
+  height: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(15, 23, 42, 0.04);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dashboard-footer__logo-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 4px 12px rgba(37, 99, 235, 0.08),
+    0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.dashboard-footer__logo-img {
+  max-height: 48px;
+  max-width: min(100%, 160px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.dashboard-footer__logo-missing {
+  display: block;
+  width: min(100%, 120px);
+  height: 36px;
+  margin: 0 auto;
+  border-radius: 8px;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(148, 163, 184, 0.12),
+    rgba(148, 163, 184, 0.12) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+}
+
+.dashboard-footer__tagline {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #94a3b8;
+  font-weight: 600;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: "Cairo", sans-serif;
+}
+
+/* Dark theme (user dashboard uses data-admin-theme on .admin-layout) */
+.admin-layout[data-admin-theme="dark"] .dashboard-footer {
+  border-top-color: rgba(148, 163, 184, 0.2);
+  background: linear-gradient(180deg, rgba(11, 18, 32, 0.4) 0%, #0b1220 55%, #070b12 100%);
+}
+
+.admin-layout[data-admin-theme="dark"] .dashboard-footer__glow {
+  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(56, 189, 248, 0.12), transparent 72%);
+}
+
+.admin-layout[data-admin-theme="dark"] .dashboard-footer__label {
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.admin-layout[data-admin-theme="dark"] .dashboard-footer__logo-card {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.admin-layout[data-admin-theme="dark"] .dashboard-footer__logo-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow:
+    0 4px 16px rgba(56, 189, 248, 0.12),
+    0 20px 48px rgba(0, 0, 0, 0.35);
+}
+
+.admin-layout[data-admin-theme="dark"] .dashboard-footer__tagline {
+  color: rgba(148, 163, 184, 0.88);
+}
+
+@media (max-width: 768px) {
+  .dashboard-footer {
+    padding: 16px 12px 18px;
+  }
+
+  .dashboard-footer__logo-card {
+    min-height: 64px;
+    padding: 12px 12px;
+  }
+
+  .dashboard-footer__logo-img {
+    max-height: 40px;
+    max-width: min(100%, 140px);
+  }
+}

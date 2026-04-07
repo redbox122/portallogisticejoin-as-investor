@@ -8,7 +8,7 @@
     "email_placeholder": "Enter your email",
     "phone_number": "Phone Number",
     "phone_number_placeholder": "Enter phone number",
-    "region_placeholder": "Enter region",
+    "region_placeholder": "Enter city",
     "mobile_number": "Mobile Number",
     "password": "Password",
     "password-confirmation": "Confirm Password",
@@ -35,7 +35,9 @@
     "family_name": "Family Name",
     "national_id": "National ID",
     "birth_date": "Birth Date",
-    "region": "Region",
+    "region": "City",
+    "birth_date_gregorian_picker_note": "Choose the date in the Gregorian calendar. The Hijri date shown below follows the official Saudi Umm al-Qura calendar.",
+    "birth_date_hijri_umalqura_label": "Hijri (Umm al-Qura)",
     "national_address_email": "National Address Email",
     "bank_name": "Bank Name",
     "iban": "IBAN",
@@ -70,6 +72,8 @@
         "email_phone_national_id_placeholder": "Enter email, phone, or national ID",
         "password": "Password",
         "password_placeholder": "Enter your password",
+        "show_password": "Show password",
+        "hide_password": "Hide password",
         "login_button": "Login",
         "user_login": "User Login",
         "admin_login": "Admin Login",
@@ -96,6 +100,14 @@
         "logout": "Logout",
         "loading": "Loading...",
         "currency": "SAR",
+        "footer": {
+            "partners_line": "Official partners & national platforms",
+            "tagline": "Digital services connected with trusted Saudi government and business ecosystems.",
+            "logo_alt_1": "Company logo",
+            "logo_alt_2": "National and international center logo",
+            "logo_alt_3": "Saudi Business Center logo",
+            "logo_alt_4": "Nafath logo"
+        },
         "success": {
             "title": "Success",
             "contract_created": "Contract created successfully",
@@ -106,7 +118,8 @@
             "contracts_created_message": "Selling and rental contracts created successfully",
             "profile_updated": "Profile updated successfully",
             "profile_completed": "Profile completed successfully",
-            "document_uploaded": "Document uploaded successfully"
+            "document_uploaded": "Document uploaded successfully",
+            "receipt_uploaded": "Receipt uploaded successfully"
         },
         "nafath": {
             "waiting_title": "Waiting for Nafath Approval",
@@ -153,7 +166,7 @@
             "pdf_load_failed": "Failed to load PDF",
             "pdf_not_available": "PDF not available at this time",
             "update_profile": "Error updating profile",
-            "invalid_region": "Invalid region",
+            "invalid_region": "City is invalid",
             "selling_required_first": "You must create a selling contract before creating a rental contract",
             "rental_required_for_previous": "You must complete the rental contract for previous selling contract",
             "contract_limit_reached": "You have reached the maximum number of contracts allowed",
@@ -164,7 +177,10 @@
             "upload_failed": "Failed to upload document",
             "document_rejected": "Document Rejected",
             "national_id_mismatch": "National ID Mismatch",
-            "update_failed": "Update Failed"
+            "update_failed": "Update Failed",
+            "file_too_large": "File size must be less than 5MB",
+            "document_already_uploaded": "This document has already been uploaded and approved. You cannot upload it again.",
+            "document_under_review": "This document is currently under review. Please wait until the review is complete before uploading again."
         },
         "warning": {
             "data_mismatches": "Data Mismatches Detected",
@@ -361,12 +377,6 @@
             "status_approved": "Approved",
             "month_abbr": "mo"
         },
-        "error": {
-            "title": "Error",
-            "fetch_data": "Failed to fetch data",
-            "upload_failed": "Upload failed",
-            "file_too_large": "File size must be less than 5MB"
-        },
         "notifications": {
             "title": "Notifications",
             "subtitle": "Stay updated with your account activity",
@@ -391,11 +401,6 @@
             "all_marked_read": "All notifications marked as read",
             "completed": "Notification completed",
             "dismissed": "Notification dismissed"
-        },
-        "success": {
-            "title": "Success",
-            "document_uploaded": "Document uploaded successfully",
-            "receipt_uploaded": "Receipt uploaded successfully"
         }
     },
     "admin": {
@@ -463,7 +468,21 @@
             "invalid_user": "Invalid user",
             "send_email_credentials": "Send login credentials via email",
             "send_email_credentials_en": "Send login credentials via email",
-            "email_required_for_send": "Email is required to send login credentials"
+            "email_required_for_send": "Email is required to send login credentials",
+            "name": "Name",
+            "total_users": "Total users: {{count}}",
+            "back_to_list": "Back to users",
+            "back_to_profile": "Back to profile",
+            "user_profile_title": "User profile",
+            "user_profile_subtitle": "View account details (read-only)",
+            "update_user_title": "Update user",
+            "national_address_email": "National address email",
+            "confirm_activate_title": "Activate this user?",
+            "confirm_activate_message": "This user will be able to sign in and use the platform again.",
+            "confirm_deactivate_title": "Deactivate this user?",
+            "confirm_deactivate_message": "This user will not be able to sign in until an administrator activates the account again.",
+            "confirm_cancel": "Cancel",
+            "confirm_proceed": "Confirm"
         },
         "contracts": {
             "title": "Contract Management",

@@ -8,7 +8,7 @@
     "email_placeholder": "أدخل بريدك الإلكتروني",
     "phone_number": "رقم الهاتف",
     "phone_number_placeholder": "أدخل رقم الهاتف",
-    "region_placeholder": "أدخل المنطقة",
+    "region_placeholder": "أدخل المدينة",
     "mobile_number": "رقم الجوال",
     "password": "كلمة المرور",
     "password-confirmation": "تأكيد كلمة المرور",
@@ -35,7 +35,9 @@
     "family_name": "اسم العائلة",
     "national_id": "رقم الهوية",
     "birth_date": "تاريخ الميلاد",
-    "region": "المنطقة",
+    "region": "المدينة",
+    "birth_date_gregorian_picker_note": "يُختار التاريخ بالتقويم الميلادي. يظهر أدناه الموافق بالتقويم الهجري الرسمي في المملكة (أم القرى).",
+    "birth_date_hijri_umalqura_label": "الموافق هجريًا (أم القرى)",
     "national_address_email": "البريد الإلكتروني حسب العنوان الوطني",
     "bank_name": "اسم البنك",
     "iban": "رقم الآيبان",
@@ -70,6 +72,8 @@
         "email_phone_national_id_placeholder": "أدخل البريد الإلكتروني أو رقم الهاتف أو رقم الهوية",
         "password": "كلمة المرور",
         "password_placeholder": "أدخل كلمة المرور",
+        "show_password": "إظهار كلمة المرور",
+        "hide_password": "إخفاء كلمة المرور",
         "login_button": "تسجيل الدخول",
         "user_login": "تسجيل دخول مستخدم",
         "admin_login": "تسجيل دخول مدير",
@@ -96,6 +100,14 @@
         "logout": "تسجيل الخروج",
         "loading": "جاري التحميل...",
         "currency": "ريال",
+        "footer": {
+            "partners_line": "شركاء رسميون ومنصات وطنية",
+            "tagline": "خدمات رقمية متصلة بمنظومة الأعمال والجهات الموثوقة في المملكة.",
+            "logo_alt_1": "شعار المنصة",
+            "logo_alt_2": "شعار المركز الوطني والدولي",
+            "logo_alt_3": "شعار المركز السعودي للأعمال",
+            "logo_alt_4": "شعار نفاذ"
+        },
         "success": {
             "title": "نجح",
             "contract_created": "تم إنشاء العقد بنجاح",
@@ -106,7 +118,8 @@
             "contracts_created_message": "تم إنشاء عقد البيع وعقد الإيجار بنجاح",
             "profile_updated": "تم تحديث الملف الشخصي بنجاح",
             "profile_completed": "تم إكمال الملف الشخصي بنجاح",
-            "document_uploaded": "تم رفع المستند بنجاح"
+            "document_uploaded": "تم رفع المستند بنجاح",
+            "receipt_uploaded": "تم رفع الإيصال بنجاح"
         },
         "nafath": {
             "waiting_title": "في انتظار موافقة نفاذ",
@@ -153,7 +166,7 @@
             "pdf_load_failed": "فشل تحميل ملف PDF",
             "pdf_not_available": "ملف PDF غير متاح حالياً",
             "update_profile": "حدث خطأ أثناء تحديث الملف الشخصي",
-            "invalid_region": "المنطقة غير صحيحة",
+            "invalid_region": "المدينة غير صحيحة",
             "selling_required_first": "يجب إنشاء عقد بيع أولاً قبل إنشاء عقد إيجار",
             "rental_required_for_previous": "يجب إكمال عقد الإيجار للعقد السابق",
             "contract_limit_reached": "تم الوصول للحد الأقصى من العقود المسموح بها",
@@ -164,7 +177,10 @@
             "upload_failed": "فشل رفع المستند",
             "document_rejected": "تم رفض المستند",
             "national_id_mismatch": "عدم تطابق رقم الهوية الوطنية",
-            "update_failed": "فشل تحديث الملف الشخصي"
+            "update_failed": "فشل تحديث الملف الشخصي",
+            "file_too_large": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+            "document_already_uploaded": "تم رفع هذا المستند واعتماده مسبقاً. لا يمكنك الرفع مرة أخرى.",
+            "document_under_review": "هذا المستند قيد المراجعة حالياً. يرجى الانتظار حتى اكتمال المراجعة قبل الرفع مرة أخرى."
         },
         "warning": {
             "data_mismatches": "تم اكتشاف اختلافات في البيانات",
@@ -375,14 +391,6 @@
             "status_approved": "مقبول",
             "month_abbr": "شهر"
         },
-        "error": {
-            "title": "خطأ",
-            "fetch_data": "فشل في جلب البيانات",
-            "upload_failed": "فشل الرفع",
-            "file_too_large": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
-            "document_already_uploaded": "تم رفع هذا المستند واعتماده مسبقاً. لا يمكنك الرفع مرة أخرى.",
-            "document_under_review": "هذا المستند قيد المراجعة حالياً. يرجى الانتظار حتى اكتمال المراجعة قبل الرفع مرة أخرى."
-        },
         "notifications": {
             "title": "الإشعارات",
             "subtitle": "ابق على اطلاع بنشاط حسابك",
@@ -407,11 +415,6 @@
             "all_marked_read": "تم تحديد جميع الإشعارات كمقروءة",
             "completed": "تم إكمال الإشعار",
             "dismissed": "تم رفض الإشعار"
-        },
-        "success": {
-            "title": "نجح",
-            "document_uploaded": "تم رفع المستند بنجاح",
-            "receipt_uploaded": "تم رفع الإيصال بنجاح"
         }
     },
     "admin": {
@@ -479,7 +482,21 @@
             "invalid_user": "مستخدم غير صحيح",
             "send_email_credentials": "إرسال بيانات تسجيل الدخول عبر البريد الإلكتروني",
             "send_email_credentials_en": "Send login credentials via email",
-            "email_required_for_send": "يجب إدخال البريد الإلكتروني لإرسال بيانات تسجيل الدخول / Email is required to send login credentials"
+            "email_required_for_send": "يجب إدخال البريد الإلكتروني لإرسال بيانات تسجيل الدخول / Email is required to send login credentials",
+            "name": "الاسم",
+            "total_users": "إجمالي المستخدمين: {{count}}",
+            "back_to_list": "العودة إلى المستخدمين",
+            "back_to_profile": "العودة إلى الملف",
+            "user_profile_title": "ملف المستخدم",
+            "user_profile_subtitle": "عرض تفاصيل الحساب (للقراءة فقط)",
+            "update_user_title": "تحديث المستخدم",
+            "national_address_email": "البريد الوطني للعنوان",
+            "confirm_activate_title": "تفعيل هذا المستخدم؟",
+            "confirm_activate_message": "سيتمكن المستخدم من تسجيل الدخول واستخدام المنصة مرة أخرى.",
+            "confirm_deactivate_title": "تعطيل هذا المستخدم؟",
+            "confirm_deactivate_message": "لن يتمكن المستخدم من تسجيل الدخول حتى يقوم المسؤول بتفعيل الحساب من جديد.",
+            "confirm_cancel": "إلغاء",
+            "confirm_proceed": "تأكيد"
         },
         "contracts": {
             "title": "إدارة العقود",

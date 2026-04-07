@@ -46,7 +46,10 @@ import ContractInfoPage from './Pages/Dashboard/ContractInfoPage';
 import AdminLayout from './Components/AdminLayout';
 import AdminOverviewPage from './Pages/Admin/OverviewPage';
 import AdminStatisticsPage from './Pages/Admin/StatisticsPage';
+import AdminUsersSection from './Pages/Admin/AdminUsersSection';
 import AdminUsersPage from './Pages/Admin/UsersPage';
+import AdminUserShowPage from './Pages/Admin/AdminUserShowPage';
+import AdminUserUpdatePage from './Pages/Admin/AdminUserUpdatePage';
 import AdminContractsPage from './Pages/Admin/ContractsPage';
 import AdminPaymentsPage from './Pages/Admin/PaymentsPage';
 import AdminAnalyticsPage from './Pages/Admin/AnalyticsPage';
@@ -122,7 +125,11 @@ root.render(
           >
             <Route index element={<AdminOverviewPage />} />
             <Route path="statistics" element={<AdminStatisticsPage />} />
-            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="users" element={<AdminUsersSection />}>
+              <Route index element={<AdminUsersPage />} />
+              <Route path=":userId/show" element={<AdminUserShowPage />} />
+              <Route path=":userId/update" element={<AdminUserUpdatePage />} />
+            </Route>
             <Route path="investments" element={<AdminInvestmentsPage />} />
             <Route path="contracts" element={<AdminContractsPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />

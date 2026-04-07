@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/AuthContext';
 import axios from 'axios';
@@ -7,6 +7,38 @@ import { Store } from 'react-notifications-component';
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { API_BASE_URL } from '../config';
+
+/** Visual order of fields in the form (used to scroll to the first invalid field). */
+const PROFILE_COMPLETION_FIELD_ORDER = [
+  'national_id',
+  'birth_date',
+  'first_name',
+  'father_name',
+  'grandfather_name',
+  'family_name',
+  'region',
+  'phone',
+  'email',
+  'bank_name',
+  'iban'
+];
+function formatBirthDateUmmAlQura(isoYmd, language) {
+  if (!isoYmd || !/^\d{4}-\d{2}-\d{2}$/.test(isoYmd)) return null;
+  const [y, mo, d] = isoYmd.split('-').map(Number);
+  const date = new Date(y, mo - 1, d);
+  if (Number.isNaN(date.getTime())) return null;
+  try {
+    const locale = language === 'ar' ? 'ar-SA' : 'en-SA';
+    return new Intl.DateTimeFormat(locale, {
+      calendar: 'islamic-umalqura',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+  } catch {
+    return null;
+  }
+}
 
 const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
   const { t, i18n } = useTranslation(['common']);
@@ -106,7 +138,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
     }
   };
 
-  const validateForm = () => {
+  const getValidationErrors = () => {
     const newErrors = {};
 
     if (!formData.national_id.trim()) {
@@ -154,10 +186,9 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
       }
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
-
+    
   const handleSaveDraftAndClose = () => {
     try {
       localStorage.setItem('profile_completion_draft', JSON.stringify(formData));
@@ -182,8 +213,27 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
+
+    const newErrors = getValidationErrors();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      const firstKey = PROFILE_COMPLETION_FIELD_ORDER.find((k) => newErrors[k]);
+      if (firstKey) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const wrapper = document.getElementById(`profile-field-${firstKey}`);
+            if (wrapper) {
+              wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              const focusable =
+                wrapper.querySelector('.react-international-phone-input') ||
+                wrapper.querySelector('input:not([type="hidden"]), textarea, select');
+              if (focusable && !focusable.disabled) {
+                focusable.focus({ preventScroll: true });
+              }
+            }
+          });
+        });
+      }
       return;
     }
 
@@ -257,9 +307,16 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
         });
         
         if (allFieldsComplete) {
+          const rawSuccessMsg = response.data?.message;
+          let successMessage = t('dashboard.success.profile_completed');
+          if (typeof rawSuccessMsg === 'string' && rawSuccessMsg.trim()) {
+            const s = rawSuccessMsg.trim();
+            const translated = t(s);
+            successMessage = translated !== s ? translated : s;
+          }
           Store.addNotification({
             title: t('dashboard.success.title'),
-            message: response.data.message || t('dashboard.success.profile_completed'),
+            message: successMessage,
             type: 'success',
             insert: 'top',
             container: 'top-right',
@@ -315,6 +372,10 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
   const currentLang = i18n.language;
   const isRTL = currentLang === 'ar';
 
+  const hijriBirthDisplay = useMemo(
+    () => formatBirthDateUmmAlQura(formData.birth_date, currentLang),
+    [formData.birth_date, currentLang]
+  );
   return (
     <div 
       className="modal-overlay profile-completion-overlay"
@@ -349,7 +410,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
             <div className="form-section">
               <h3>{t('admin.users.personal_info')}</h3>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group" id="profile-field-national_id">
                   <label>{t('national_id')} *</label>
                   <input
                     type="text"
@@ -374,20 +435,29 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                   />
                   {errors.national_id && <p className="error-message">{errors.national_id}</p>}
                 </div>
-                <div className="form-group">
-                  <label>{t('birth_date')} *</label>
+                <div className="form-group" id="profile-field-birth_date">
+                  <label htmlFor="profile-birth-date-input">{t('birth_date')} *</label>
+                 <p className="birth-date-gregorian-note">
+                  {t('birth_date_gregorian_picker_note')}</p>
                   <input
                     type="date"
+                    id="profile-birth-date-input"
                     value={formData.birth_date}
                     onChange={(e) => handleChange('birth_date', e.target.value)}
                     className={errors.birth_date ? 'input-error' : ''}
                     required
                   />
+                  {hijriBirthDisplay && (
+      <p className="birth-date-hijri-equivalent" role="status">
+        <span className="birth-date-hijri-label">{t('birth_date_hijri_umalqura_label')}:</span>{' '}
+        <span className="birth-date-hijri-value">{hijriBirthDisplay}</span>
+      </p>
+    )}
                   {errors.birth_date && <p className="error-message">{errors.birth_date}</p>}
                 </div>
               </div>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group" id="profile-field-first_name">
                   <label>{t('first_name')} *</label>
                   <input
                     type="text"
@@ -399,7 +469,34 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                   />
                   {errors.first_name && <p className="error-message">{errors.first_name}</p>}
                 </div>
-                <div className="form-group">
+               <div className="form-group" id="profile-field-father_name">
+                  <label>{t('father_name')} *</label>
+                  <input
+                    type="text"
+                    value={formData.father_name}
+                    onChange={(e) => handleChange('father_name', e.target.value)}
+                    className={errors.father_name ? 'input-error' : ''}
+                    placeholder={t('father_name')}
+                    required
+                  />
+                  {errors.father_name && <p className="error-message">{errors.father_name}</p>}
+                </div>
+              </div>
+              <div className="form-row">
+                
+                <div className="form-group" id="profile-field-grandfather_name">
+                  <label>{t('grandfather_name')} *</label>
+                  <input
+                    type="text"
+                    value={formData.grandfather_name}
+                    onChange={(e) => handleChange('grandfather_name', e.target.value)}
+                    className={errors.grandfather_name ? 'input-error' : ''}
+                    placeholder={t('grandfather_name')}
+                    required
+                  />
+                  {errors.grandfather_name && <p className="error-message">{errors.grandfather_name}</p>}
+                </div>
+ <div className="form-group" id="profile-field-family_name">
                   <label>{t('family_name')} *</label>
                   <input
                     type="text"
@@ -413,33 +510,9 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                 </div>
               </div>
               <div className="form-row">
-                <div className="form-group">
-                  <label>{t('father_name')} *</label>
-                  <input
-                    type="text"
-                    value={formData.father_name}
-                    onChange={(e) => handleChange('father_name', e.target.value)}
-                    className={errors.father_name ? 'input-error' : ''}
-                    placeholder={t('father_name')}
-                    required
-                  />
-                  {errors.father_name && <p className="error-message">{errors.father_name}</p>}
-                </div>
-                <div className="form-group">
-                  <label>{t('grandfather_name')} *</label>
-                  <input
-                    type="text"
-                    value={formData.grandfather_name}
-                    onChange={(e) => handleChange('grandfather_name', e.target.value)}
-                    className={errors.grandfather_name ? 'input-error' : ''}
-                    placeholder={t('grandfather_name')}
-                    required
-                  />
-                  {errors.grandfather_name && <p className="error-message">{errors.grandfather_name}</p>}
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
+             
+
+                <div className="form-group" id="profile-field-region">
                   <label>{t('region')} *</label>
                   <input
                     type="text"
@@ -458,7 +531,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
             <div className="form-section">
               <h3>{t('admin.users.contact_info')}</h3>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group" id="profile-field-phone">
                   <label>{t('phone_number')} *</label>
                   <PhoneInput
                     defaultCountry="sa"
@@ -484,7 +557,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                   />
                   {errors.phone && <p className="error-message">{errors.phone}</p>}
                 </div>
-                <div className="form-group">
+                <div className="form-group" id="profile-field-email">
                   <label>{t('email')}</label>
                   <input
                     type="email"
@@ -502,7 +575,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
             <div className="form-section">
               <h3>{t('admin.users.banking_info')}</h3>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group" id="profile-field-bank_name">
                   <label>{t('bank_name')} *</label>
                   <input
                     type="text"
@@ -514,7 +587,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                   />
                   {errors.bank_name && <p className="error-message">{errors.bank_name}</p>}
                 </div>
-                <div className="form-group">
+                <div className="form-group" id="profile-field-iban">
                   <label>{t('iban')} *</label>
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', direction: 'ltr' }}>
                     <span style={{ 
@@ -551,7 +624,7 @@ const ProfileCompletionModal = ({ userProfile, onComplete, onSkip }) => {
                 disabled={loading}
                 onClick={handleSaveDraftAndClose}
               >
-                {i18n.language === 'ar' ? 'حفظ البيانات وإكمال لاحقاً' : 'Save draft & continue later'}
+                {i18n.language === 'ar' ? '  إكمال لاحقاً'  : 'continue later'}
               </button>
 
               <button onClick={handleSubmit} type="submit" className="submit-btn primary-btn" disabled={loading}>

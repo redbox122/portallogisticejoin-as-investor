@@ -10,6 +10,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import '../Css/admin-layout.css';
 import '../Css/dashboard-header-saas.css';
+import DashboardFooter from './DashboardFooter';
 
 const THEME_KEY = 'theme';
 const LEGACY_THEME_KEY = 'user_theme';
@@ -426,6 +427,8 @@ const DashboardLayout = () => {
         <main className="admin-main-content" id="dashboard-main-content">
           <Outlet />
         </main>
+
+        <DashboardFooter />
       </div>
 
       {/* Real-time Notification Handler - handles all notification types with sound and popup */}
