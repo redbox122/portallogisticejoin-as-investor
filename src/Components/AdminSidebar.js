@@ -48,6 +48,12 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
       label: 'التقارير',
     },
     {
+id:'invoices',
+path:'/admin/invoices',
+icon:'fa-file-invoice-dollar',
+label:'الفواتير'
+    },
+    {
       id: 'settings',
       path: '/admin/settings',
       icon: 'fa-cog',

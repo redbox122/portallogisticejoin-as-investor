@@ -21,6 +21,7 @@ const UserSidebar = ({ isOpen, onToggle }) => {
     { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', labelAr: 'العقود', labelEn: 'Contracts' },
     { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', labelAr: 'الأرباح', labelEn: 'Analytics' },
     { id: 'profile', path: '/dashboard/profile', icon: 'fa-user', labelAr: 'الملف الشخصي', labelEn: 'Profile' },
+    { id: 'invoices', path: '/dashboard/invoices', icon: 'fa-file-invoice-dollar', labelAr: 'الفواتير', labelEn: 'Invoices' },
     { id: 'logout', path: '/logout', icon: 'fa-sign-out-alt', labelAr: 'تسجيل الخروج', labelEn: 'Logout' },
   ];
 

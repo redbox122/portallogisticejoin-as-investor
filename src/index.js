@@ -64,6 +64,8 @@ import 'react-notifications-component/dist/theme.css';
 import { setupAxios401Interceptor } from './utils/api';
 import InvestmentsPage from './Pages/Dashboard/InvestmentsPage.js';
 import AdminInvestmentsPage from './Pages/Admin/AdminInvestmentsPage.js';
+import InvoicesPage from './Pages/Dashboard/InvoicesPage.js';
+import AdminInvoicesPage from './Pages/Admin/AdminInvoicesPage.js';
 
 /* Apply saved theme + RTL before first paint (user dashboard + global) */
 (() => {
@@ -109,6 +111,7 @@ root.render(
             <Route path="settings" element={<ProfilePage />} />
             <Route path="investments" element={<InvestmentsPage />} />
             <Route path="tasks" element={<TasksPage />} />
+            <Route path="invoices" element={<InvoicesPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
             <Route path="contractor-info" element={<ContractInfoPage />} />
           </Route>
@@ -136,6 +139,7 @@ root.render(
             <Route path="documents" element={<AdminDocumentsPage />} />
             <Route path="activity" element={<AdminActivityLogsPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path ="invoices" element={<AdminInvoicesPage />} />
             <Route path="email-templates" element={<AdminEmailTemplatesPage />} />
           </Route>
           
