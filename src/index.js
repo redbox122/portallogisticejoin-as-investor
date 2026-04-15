@@ -66,6 +66,8 @@ import InvestmentsPage from './Pages/Dashboard/InvestmentsPage.js';
 import AdminInvestmentsPage from './Pages/Admin/AdminInvestmentsPage.js';
 import InvoicesPage from './Pages/Dashboard/InvoicesPage.js';
 import AdminInvoicesPage from './Pages/Admin/AdminInvoicesPage.js';
+import RequestsPage from './Pages/Dashboard/RequestsPagte.js';
+import AdminRequestsPage from './Pages/Admin/AdminRequestsPage.js';
 
 /* Apply saved theme + RTL before first paint (user dashboard + global) */
 (() => {
@@ -114,6 +116,7 @@ root.render(
             <Route path="invoices" element={<InvoicesPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
             <Route path="contractor-info" element={<ContractInfoPage />} />
+         <Route path="requests" element={<RequestsPage />} />
           </Route>
           
           {/* Protected admin routes with layout */}
@@ -141,6 +144,7 @@ root.render(
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path ="invoices" element={<AdminInvoicesPage />} />
             <Route path="email-templates" element={<AdminEmailTemplatesPage />} />
+              <Route path="requests" element={<AdminRequestsPage />}  />
           </Route>
           
           {/* Legacy admin route redirect */}

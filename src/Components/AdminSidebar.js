@@ -54,10 +54,10 @@ icon:'fa-file-invoice-dollar',
 label:'الفواتير'
     },
     {
-      id: 'settings',
-      path: '/admin/settings',
-      icon: 'fa-cog',
-      label: 'الإعدادات'
+      id: 'requests',
+      path: '/admin/requests',
+      icon: 'fa-envelope',
+      label: 'الطلبات'
     },
     {
       id: 'favorites',

@@ -417,7 +417,7 @@ const InvestmentsPage = () => {
           <h1 className="investments-title">استثماراتي</h1>
           <p className="investments-lead">
             عقودك المعتمدة وجداول الدفعات الشهرية. يُفعَّل الاستثمار تلقائياً بعد{' '}
-            <strong>35 يوماً</strong> من تاريخ اعتماد العقد، ثم يبدأ جدول الدفعات لمدة 12 شهراً.
+            <strong>35 يوماً</strong> من تاريخ اعتماد ايصال الدفغ ثم يبدأ جدول الدفعات لمدة 12 شهراً.
           </p>
 
           {!loading && contracts.length > 0 && (

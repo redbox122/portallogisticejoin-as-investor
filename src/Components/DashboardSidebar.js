@@ -85,6 +85,12 @@ const DashboardSidebar = ({ isOpen, onToggle }) => {
       urgent: urgentCount > 0
     },
     {
+id:'requests',
+path:'/dashboard/requests',
+icon:'fa-envelope',
+label: 'الطلبات'
+    },
+    {
       id: 'contractor-info',
       path: '/dashboard/contractor-info',
       icon: 'fa-file-pdf',
