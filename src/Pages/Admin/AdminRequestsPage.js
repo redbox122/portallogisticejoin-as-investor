@@ -17,7 +17,9 @@ const STATUS_META = {
   in_review:     { label: 'تحت المعالجة',  cls: 'arq-pill--review',    icon: 'fa-hourglass-half' },
   approved:      { label: 'تمت الموافقة',  cls: 'arq-pill--approved',  icon: 'fa-circle-check' },
   rejected:      { label: 'مرفوض',         cls: 'arq-pill--rejected',  icon: 'fa-circle-xmark' },
+  invoice_sent:  { label: 'تم إرسال الفاتورة', cls: 'arq-pill--invoice',   icon: 'fa-paper-plane' },
   whatsapp_sent: { label: 'تم التواصل',    cls: 'arq-pill--whatsapp',  icon: 'fa-comment-dots' },
+  invoice_signed: { label: 'تم توقيع العقد', cls: 'arq-pill--signed',    icon: 'fa-file-signature' },
 };
 
 function fmtDate(d) {
@@ -257,7 +259,7 @@ const RequestRow = ({ req, onApprove, onReject, onWhatsapp, onDeploy, onViewInvo
   const meta     = STATUS_META[req.status] || STATUS_META.pending;
   const typeMeta = TYPE_META[req.type]     || {};
   const busy     = actioning === req.id;
-  const canAct   = ['pending', 'in_review'].includes(req.status);
+  const canAct   = [ 'invoice_signed'].includes(req.status);
   const isAddBike = req.type === 'add_bike';
   const hasInvoice = req.admin_invoice_path;
 
@@ -304,7 +306,7 @@ const RequestRow = ({ req, onApprove, onReject, onWhatsapp, onDeploy, onViewInvo
               </button>
             </>
           )}
-          {canAct && isAddBike && (
+          { isAddBike && (
             <>
               <button type="button" className="arq-btn arq-btn--whatsapp" onClick={() => onWhatsapp(req)} disabled={busy}>
                 {busy ? <i className="fas fa-spinner fa-spin"></i> : <><i className="fab fa-whatsapp"></i> واتساب</>}

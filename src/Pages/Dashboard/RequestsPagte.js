@@ -30,6 +30,9 @@ const STATUS_META = {
   approved:      { label: 'تمت الموافقة',  cls: 'rq-pill--approved',  icon: 'fa-circle-check' },
   rejected:      { label: 'مرفوض',         cls: 'rq-pill--rejected',  icon: 'fa-circle-xmark' },
   whatsapp_sent: { label: 'تم التواصل',    cls: 'rq-pill--whatsapp',  icon: 'fa-comment-dots' },
+  invoice_sent:  { label: 'تم إرسال الفاتورة', cls: 'rq-pill--invoice', icon: 'fa-paper-plane' },
+  nafath_pending:{ label: 'بانتظار توقيع نفاذ', cls: 'rq-pill--nafath', icon: 'fa-mobile-screen-button' },
+  invoice_signed: { label: 'تم توقيع الفاتورة', cls: 'rq-pill--signed', icon: 'fa-pen-fancy' },
 };
 
 function fmtDate(d) {
