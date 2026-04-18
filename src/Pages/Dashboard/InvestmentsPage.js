@@ -384,7 +384,7 @@ const InvestmentsPage = () => {
         headers: getAuthHeaders(),
       });
       const all = res.data?.data || [];
-      const approved = all.filter((c) => c.status === 'approved' && c.type === 'rental');
+      const approved = all.filter((c) => c.status === 'approved' && c.type === 'rental' && c.monthly_payment_amount > 0);
       setContracts(approved);
     } catch (err) {
       console.error('Failed to load contracts', err);

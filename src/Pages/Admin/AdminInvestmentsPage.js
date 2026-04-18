@@ -321,7 +321,7 @@ const AdminInvestmentsPage = () => {
       <div className="aip-header">
         <div>
           <h1 className="aip-title">
-            <i className="fas fa-chart-line" aria-hidden="true"></i> إدارة الدفعات
+            <i className="fas fa-chart-line" aria-hidden="true"></i> جدولة المستحقات الإيجارية
           </h1>
           <p className="aip-subtitle">رفع إيصالات الدفع وتتبع حالة الدفعات الشهرية لجميع عقود الاستثمار.</p>
         </div>

@@ -276,7 +276,7 @@ const AdminInvoicesPage = () => {
         <div>
           <h1 className="ainv-title">
             <i className="fas fa-file-invoice-dollar" aria-hidden="true"></i>
-            إدارة فواتير الصيانة
+إدارة مخصصات الصيانة التشغيلية
           </h1>
           <p className="ainv-subtitle">مراجعة وقبول أو رفض إيصالات تأمين الصيانة للمستثمرين</p>
         </div>

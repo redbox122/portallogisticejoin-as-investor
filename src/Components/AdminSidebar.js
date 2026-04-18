@@ -27,19 +27,19 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
       id: 'investments',
       path: '/admin/investments',
       icon: 'fa-piggy-bank',
-      label: 'الاستثمارات',
+      label: 'جدولة المستحقات الإيجارية',
     },
     {
       id: 'contracts',
       path: '/admin/contracts',
       icon: 'fa-file-contract',
-      label: 'العقود',
+      label: 'مركز إدارة الملكية والتعاقدات',
     },
     {
       id: 'users',
       path: '/admin/users',
       icon: 'fa-users',
-      label: 'المستخدمين',
+      label: 'سجل ملاك الأصول (الشركاء)',
     },
     {
       id: 'reports',
@@ -51,7 +51,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
 id:'invoices',
 path:'/admin/invoices',
 icon:'fa-file-invoice-dollar',
-label:'الفواتير'
+label:'إدارة مخصصات الصيانة التشغيلية'
     },
     {
       id: 'requests',

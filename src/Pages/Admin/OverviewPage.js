@@ -277,7 +277,7 @@ const AdminOverviewPage = () => {
               <div className="card kpi-card kpi-blue">
                 <div className="kpi-row">
                   <div>
-                    <p className="kpi-label">إجمالي المحفظة</p>
+                    <p className="kpi-label">إجمالي القيمة التقديرية للأصول</p>
                     <p className="kpi-value">{formatSAR(stats.totalPortfolio)}</p>
                     <div className="kpi-sub">
                       <span className="delta">+4.1%</span>
@@ -292,7 +292,7 @@ const AdminOverviewPage = () => {
               <div className="card kpi-card kpi-green">
                 <div className="kpi-row">
                   <div>
-                    <p className="kpi-label">الأرباح</p>
+                    <p className="kpi-label">العوائد التشغيلية الموزعة</p>
                     <p className="kpi-value">{formatSAR(stats.profits)}</p>
                     <div className="kpi-sub">
                       <div style={{ marginTop: 2 }}>

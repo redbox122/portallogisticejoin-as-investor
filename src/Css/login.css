@@ -1,297 +1,328 @@
-.login-page {
+/* ══════════════════════════════════════════════════════════
+   login.css  — Portal Logistic Login Page
+   ══════════════════════════════════════════════════════════ */
+
+/* ── page shell ─────────────────────────────────────────── */
+
+.lp-page {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
-  padding: 20px;
-  font-family: "Cairo", sans-serif;
+  justify-content: center;
+  background: linear-gradient(145deg, #f0f4ff 0%, #e8f0fe 60%, #f5f7ff 100%);
+  padding: 24px 16px;
+  font-family: 'Cairo', sans-serif;
 }
-/* Hide the default browser password reveal icon (specifically for Edge) */
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-    display: none;
-    width: 0;
-    height: 0;
-}
-.login-container {
+
+/* ── card ────────────────────────────────────────────────── */
+
+.lp-card {
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(7, 52, 145, 0.10), 0 1px 6px rgba(0,0,0,0.04);
   width: 100%;
-  max-width: 450px;
-  position: relative;
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.login-logo {
-  max-width: 120px;
-  height: auto;
-  margin-bottom: 20px;
-}
-
-.login-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1c1c1c;
-  margin: 0 0 10px 0;
-  font-family: "Cairo", sans-serif;
-}
-
-.login-subtitle {
-  font-size: 14px;
-  color: #6f6f6f;
-  margin: 0;
-}
-
-.login-toggle {
+  max-width: 420px;
+  padding: 36px 32px 24px;
   display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
-  background: #f5f5f5;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── branding ────────────────────────────────────────────── */
+
+.lp-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.lp-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.lp-app-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #073491;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.lp-app-sub {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+  text-align: center;
+}
+
+/* ── toggle (user / admin) ───────────────────────────────── */
+
+.lp-toggle {
+  display: flex;
+  background: #f3f6fb;
+  border-radius: 12px;
   padding: 4px;
-  border-radius: 8px;
+  gap: 4px;
+  margin-bottom: 24px;
 }
 
-.toggle-btn {
+.lp-toggle-btn {
   flex: 1;
-  padding: 12px 20px;
+  padding: 9px 12px;
   border: none;
-  background: transparent;
-  color: #6f6f6f;
-  font-size: 14px;
+  border-radius: 9px;
+  font-size: 13px;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  font-family: "Cairo", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #6b7280;
+  background: transparent;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 
-.toggle-btn.active {
+.lp-toggle-btn--active {
   background: #073491;
   color: #ffffff;
+  box-shadow: 0 2px 8px rgba(7, 52, 145, 0.25);
 }
 
-.toggle-btn:hover:not(.active) {
-  background: #e0e0e0;
+/* ── view header ─────────────────────────────────────────── */
+
+.lp-view-header {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.login-form {
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1c1c1c;
-  font-family: "Cairo", sans-serif;
-}
-
-.form-control {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #ebebeb;
-  border-radius: 6px;
-  font-size: 16px;
-  font-family: "Cairo", sans-serif;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #073491;
-  box-shadow: 0 0 0 3px rgba(7, 52, 145, 0.1);
-}
-
-.form-control:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.form-control::placeholder {
-  color: #b2b2b2;
-}
-
-/* Password + reveal toggle (aligned for LTR/RTL, touch-friendly) */
-.login-password-field {
-  position: relative;
-  display: block;
-  width: 100%;
-}
-
-.login-password-field .login-password-input {
-  padding-inline-end: 52px;
-  min-height: 48px;
-}
-
-.login-password-field .form-control:focus {
-  position: relative;
-  z-index: 1;
-}
-
-.login-password-toggle {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-end: 6px;
-  transform: translateY(-50%);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #6f6f6f;
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.login-password-toggle:hover:not(:disabled) {
-  color: #073491;
-  background: rgba(7, 52, 145, 0.08);
-}
-
-.login-password-toggle:focus-visible {
-  outline: 2px solid #073491;
-  outline-offset: 2px;
-}
-
-.login-password-toggle:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.login-password-toggle i {
-  font-size: 1.05rem;
-  pointer-events: none;
-}
-
-.error-message {
-  background: #fee;
-  color: #c33;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #fcc;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
+.lp-view-title {
+  font-size: 17px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: "Cairo", sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: #111827;
+  margin: 0;
 }
 
-.login-btn:disabled {
-  opacity: 0.7;
+/* ── form ────────────────────────────────────────────────── */
+
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lp-form-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── field ───────────────────────────────────────────────── */
+
+.lp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.lp-field input,
+.lp-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #111827;
+  background: #fafafa;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.lp-field input:focus,
+.lp-form input:focus {
+  border-color: #073491;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(7, 52, 145, 0.08);
+}
+
+.lp-field input:disabled,
+.lp-form input:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-.btn-loader {
+/* password field */
+.lp-pass-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lp-pass-wrap input {
+  padding-left: 42px !important;
+}
+
+[dir="rtl"] .lp-pass-wrap input {
+  padding-left: 14px !important;
+  padding-right: 42px !important;
+}
+
+.lp-pass-toggle {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+[dir="rtl"] .lp-pass-toggle {
+  left: auto;
+  right: 12px;
+}
+
+.lp-pass-toggle:hover { color: #073491; }
+
+/* ── buttons ─────────────────────────────────────────────── */
+
+.lp-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  width: 100%;
 }
 
-.login-footer {
-  margin-top: 30px;
+.lp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lp-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.lp-btn--primary {
+  background: #073491;
+  color: #ffffff;
+  border-color: #073491;
+}
+
+.lp-btn--primary:hover:not(:disabled) { background: #0a3fa3; }
+
+.lp-btn--ghost {
+  background: transparent;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.lp-btn--ghost:hover:not(:disabled) { background: #f3f4f6; }
+
+.lp-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.lp-btn-row .lp-btn { flex: 1; width: auto; }
+
+/* link-style buttons */
+.lp-link-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: #073491;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 0;
+  text-align: center;
+  width: 100%;
+  transition: color 0.15s;
+}
+
+.lp-link-btn:hover { color: #0a3fa3; }
+
+.lp-link-btn--muted {
+  color: #9ca3af;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.lp-link-btn--muted:hover { color: #6b7280; }
+
+/* ── error message ───────────────────────────────────────── */
+
+.lp-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lp-error i { flex-shrink: 0; }
+
+/* ── OTP view extras ─────────────────────────────────────── */
+
+.lp-otp-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f0f4ff;
+  border-radius: 12px;
   text-align: center;
 }
 
-/* RTL Support */
-[dir="rtl"] .login-container {
-  text-align: right;
+.lp-otp-icon {
+  font-size: 32px;
+  color: #073491;
 }
 
-[dir="rtl"] .login-header {
-  text-align: center;
+.lp-otp-intro p {
+  font-size: 13px;
+  color: #374151;
+  margin: 0;
 }
 
-[dir="rtl"] .form-group label {
-  text-align: right;
-}
-
-[dir="rtl"] .error-message {
-  text-align: center;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .login-container {
-    padding: 30px 20px;
-    max-width: 100%;
-  }
-
-  .login-title {
-    font-size: 24px;
-  }
-
-  .login-logo {
-    max-width: 100px;
-  }
-
-  .toggle-btn {
-    font-size: 12px;
-    padding: 10px 15px;
-  }
-}
+/* ── responsive ──────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .login-page {
-    padding: 10px;
-  }
-
-  .login-container {
-    padding: 25px 15px;
-  }
-
-  .login-title {
-    font-size: 20px;
-  }
-
-  .login-password-field .login-password-input {
-    padding-inline-end: 54px;
-    font-size: 16px; /* avoids iOS zoom on focus */
-  }
-
-  .login-password-toggle {
-    width: 48px;
-    height: 48px;
-    inset-inline-end: 4px;
-    border-radius: 10px;
-  }
-
-  .login-password-toggle i {
-    font-size: 1.15rem;
-  }
+  .lp-page  { padding: 16px 12px; align-items: flex-start; padding-top: 32px; }
+  .lp-card  { padding: 28px 20px 20px; border-radius: 16px; }
+  .lp-logo  { height: 50px; }
 }
-

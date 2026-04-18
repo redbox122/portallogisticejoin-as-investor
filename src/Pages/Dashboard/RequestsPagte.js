@@ -39,6 +39,106 @@ function fmtDate(d) {
 
 
 
+// ── NafathModal ───────────────────────────────────────────────────────────────
+
+const NafathModal = ({ req, onClose, onSuccess }) => {
+  const { getAuthHeaders } = useAuth();
+  const [initiating, setInitiating] = useState(false);
+  const [nafathCode, setNafathCode] = useState('');
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState('waiting'); // 'waiting', 'pending', 'approved', 'failed'
+
+  const handleInitiate = async () => {
+    setInitiating(true);
+    setError('');
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/investor-requests/${req.id}/nafath`,
+        {},
+        { headers: getAuthHeaders() }
+      );
+      if (res.data?.success) {
+        setNafathCode(res.data?.challenge_number || '');
+        setStatus('pending');
+      } else {
+        setError(res.data?.message || 'فشل بدء التوثيق');
+        setStatus('failed');
+      }
+    } catch (e) {
+      setError(e?.response?.data?.message || 'خطأ في بدء التوثيق');
+      setStatus('failed');
+    } finally {
+      setInitiating(false);
+    }
+  };
+
+  return (
+    <div className="rq-overlay" onClick={e => e.target === e.currentTarget && !initiating && onClose()}>
+      <div className="rq-modal">
+        <div className="rq-modal-head" style={{ borderRightColor: '#0f766e' }}>
+          <div className="rq-modal-icon" style={{ background: '#0f766e' + '18', color: '#0f766e' }}>
+            <i className="fas fa-lock" aria-hidden="true"></i>
+          </div>
+          <div className="rq-modal-head-text">
+            <h3 className="rq-modal-title">توثيق الفاتورة</h3>
+            <p className="rq-modal-sub">توقيع الفاتورة عبر تطبيق نفاذ</p>
+          </div>
+          <button type="button" className="rq-modal-close" onClick={onClose} disabled={initiating} aria-label="إغلاق">
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+
+        {status === 'waiting' && (
+          <>
+            <p className="rq-modal-intro">اضغط أدناه لبدء عملية التوثيق الآمنة عبر تطبيق نفاذ</p>
+            {error && <div className="rq-error-chip" role="alert"><i className="fas fa-triangle-exclamation"></i> {error}</div>}
+            <div className="rq-modal-foot">
+              <button type="button" className="rq-btn rq-btn--ghost" onClick={onClose} disabled={initiating}>إلغاء</button>
+              <button type="button" className="rq-btn rq-btn--primary" onClick={handleInitiate} disabled={initiating} style={{ background: '#0f766e' }}>
+                {initiating ? <><i className="fas fa-spinner fa-spin"></i> جاري الإرسال...</> : <><i className="fas fa-mobile-screen-button"></i> فتح نفاذ</>}
+              </button>
+            </div>
+          </>
+        )}
+
+        {status === 'pending' && (
+          <>
+            <div className="rq-modal-intro">
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{ fontSize: '48px', marginBottom: '15px' }}>📱</div>
+                <p><strong>تم إرسال الطلب إلى تطبيق نفاذ</strong></p>
+                <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>يرجى فتح التطبيق واختيار الرقم للموافقة</p>
+                {nafathCode && <div style={{ background: '#f3f4f6', padding: '12px', borderRadius: '6px', marginTop: '15px', fontFamily: 'monospace', fontSize: '16px', fontWeight: 'bold', color: '#1f2937' }}>{nafathCode}</div>}
+              </div>
+            </div>
+            <div className="rq-modal-foot">
+              <button type="button" className="rq-btn rq-btn--ghost" onClick={onClose}>إغلاق</button>
+              <button type="button" className="rq-btn rq-btn--primary" onClick={onSuccess} style={{ background: '#0f766e' }}>
+                <i className="fas fa-circle-check"></i> تمت الموافقة
+              </button>
+            </div>
+          </>
+        )}
+
+        {status === 'failed' && (
+          <>
+            <p className="rq-modal-intro" style={{ textAlign: 'center', color: '#cc0000' }}>
+              <i className="fas fa-circle-exclamation"></i> حدث خطأ
+            </p>
+            {error && <div className="rq-error-chip" role="alert"><i className="fas fa-triangle-exclamation"></i> {error}</div>}
+            <div className="rq-modal-foot">
+              <button type="button" className="rq-btn rq-btn--ghost" onClick={onClose}>إغلاق</button>
+              <button type="button" className="rq-btn rq-btn--primary" onClick={handleInitiate} style={{ background: '#0f766e' }}>
+                <i className="fas fa-rotate-right"></i> إعادة المحاولة
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── ConfirmModal ──────────────────────────────────────────────────────────────
 
 const ConfirmModal = ({ requestType, userContracts, user, onClose, onSuccess }) => {
@@ -133,10 +233,11 @@ const ConfirmModal = ({ requestType, userContracts, user, onClose, onSuccess }) 
 
 // ── RequestCard ───────────────────────────────────────────────────────────────
 
-const RequestCard = ({ req }) => {
+const RequestCard = ({ req, onSignRequest }) => {
   const meta     = STATUS_META[req.status] || STATUS_META.pending;
   const typeMeta = REQUEST_TYPES.find(t => t.key === req.type);
   const hasInvoice = req.admin_invoice_path;
+  const canSign = hasInvoice && ['invoice_sent', 'nafath_pending', 'waiting_signature'].includes(req.status);
 
   const handleViewInvoice = () => {
     if (hasInvoice) {
@@ -160,11 +261,24 @@ const RequestCard = ({ req }) => {
         <div className="rq-history-date">{fmtDate(req.created_at)}</div>
         {req.contract_id && <div className="rq-history-contract"><i className="fas fa-file-contract"></i> عقد #{req.contract_id}</div>}
         {req.admin_notes && <div className="rq-history-notes"><i className="fas fa-circle-info"></i> {req.admin_notes}</div>}
-        {hasInvoice && (
-          <button type="button" className="rq-history-view-btn" onClick={handleViewInvoice} title="عرض المستند المرفق">
-            <i className="fas fa-eye"></i> عرض المستند
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+          {hasInvoice && (
+            <button type="button" className="rq-history-view-btn" onClick={handleViewInvoice} title="عرض المستند المرفق">
+              <i className="fas fa-eye"></i> عرض المستند
+            </button>
+          )}
+          {canSign && (
+            <button 
+              type="button" 
+              className="rq-history-sign-btn" 
+              onClick={() => onSignRequest(req)} 
+              title="توقيع الفاتورة عبر نفاذ"
+              style={{ background: '#0f766e', color: 'white', padding: '6px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '12px' }}
+            >
+              <i className="fas fa-pen-fancy"></i> توقيع الفاتورة
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -179,6 +293,7 @@ const RequestsPage = () => {
   const [summary, setSummary]         = useState(null);
   const [loading, setLoading]         = useState(true);
   const [confirmType, setConfirmType] = useState(null);
+  const [nafathRequest, setNafathRequest] = useState(null);
   const [successMsg, setSuccessMsg]   = useState('');
 
   const load = useCallback(async () => {
@@ -186,7 +301,7 @@ const RequestsPage = () => {
     try {
       const [rRes, cRes] = await Promise.allSettled([
         axios.get(`${API_BASE_URL}/portallogistice/requests`, { headers: getAuthHeaders() }),
-        axios.get(`${API_BASE_URL}/contracts`, { headers: getAuthHeaders() }),
+        axios.get(`${API_BASE_URL}/contracts?type=rental`, { headers: getAuthHeaders() }),
       ]);
       if (rRes.status === 'fulfilled' && rRes.value.data?.success) {
         setRequests(rRes.value.data.data.requests || []);
@@ -207,11 +322,27 @@ const RequestsPage = () => {
     setTimeout(() => setSuccessMsg(''), 5000);
   };
 
+  const handleSignRequest = (req) => {
+    setNafathRequest(req);
+  };
+
+  const handleNafathSuccess = () => {
+    setNafathRequest(null);
+    setSuccessMsg('تم توقيع الفاتورة بنجاح! سيتم تحديث حالة الطلب قريباً.');
+    // Reload requests to get updated status
+    load();
+    setTimeout(() => setSuccessMsg(''), 5000);
+  };
+
   return (
     <div className="rq-page" dir="rtl">
       {confirmType && (
         <ConfirmModal requestType={confirmType} userContracts={contracts} user={user}
           onClose={() => setConfirmType(null)} onSuccess={handleSuccess} />
+      )}
+      {nafathRequest && (
+        <NafathModal req={nafathRequest} 
+          onClose={() => setNafathRequest(null)} onSuccess={handleNafathSuccess} />
       )}
 
       <div className="rq-header">
@@ -261,7 +392,7 @@ const RequestsPage = () => {
         ) : requests.length === 0 ? (
           <div className="rq-empty"><i className="fas fa-inbox" aria-hidden="true"></i><p>لم تقدّم أي طلبات بعد.</p></div>
         ) : (
-          <div className="rq-history-list">{requests.map(r => <RequestCard key={r.id} req={r} />)}</div>
+          <div className="rq-history-list">{requests.map(r => <RequestCard key={r.id} req={r} onSignRequest={handleSignRequest} />)}</div>
         )}
       </div>
     </div>

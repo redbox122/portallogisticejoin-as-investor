@@ -410,17 +410,17 @@
         "sidebar": {
             "overview": "Overview",
             "statistics": "Statistics",
-            "users": "Users",
-            "contracts": "Contracts",
-            "payments": "Payments",
+            "users": "Asset Owners Registry",
+            "contracts": "Ownership & Management",
+            "payments": "Rental Schedule",
             "analytics": "Analytics",
             "documents": "Documents",
             "activity": "Activity Logs",
             "settings": "Settings"
         },
         "users": {
-            "title": "User Management",
-            "list": "Users List",
+            "title": "Asset Owners Registry (Partners)",
+            "list": "Asset Owners Registry (Partners)",
             "create": "Create User",
             "search": "Search",
             "search_placeholder": "Search by name, email, or national ID",
@@ -485,7 +485,7 @@
             "confirm_proceed": "Confirm"
         },
         "contracts": {
-            "title": "Contract Management",
+            "title": "Ownership & Contract Management Center",
             "list": "Contracts List",
             "contract": "Contract",
             "contracts": "Contracts",

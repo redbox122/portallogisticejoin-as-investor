@@ -17,9 +17,9 @@ const UserSidebar = ({ isOpen, onToggle }) => {
 
   const menuItems = [
     { id: 'home', path: '/dashboard', icon: 'fa-home', labelAr: 'الرئيسية', labelEn: 'Overview' },
-    { id: 'investments', path: '/dashboard/investments', icon: 'fa-piggy-bank', labelAr: 'استثماراتي', labelEn: 'Investments' },
-    { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', labelAr: 'العقود', labelEn: 'Contracts' },
-    { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', labelAr: 'الأرباح', labelEn: 'Analytics' },
+    { id: 'investments', path: '/dashboard/investments', icon: 'fa-piggy-bank', labelAr: 'جدولة المستحقات الإيجارية', labelEn: 'Rental Schedule' },
+    { id: 'contracts', path: '/dashboard/contracts', icon: 'fa-file-contract', labelAr: 'سجل تملك الأصول', labelEn: 'Asset Ownership' },
+    { id: 'profits', path: '/dashboard/analytics', icon: 'fa-chart-line', labelAr: 'العوائد التشغيلية الموزعة', labelEn: 'Operational Returns' },
     { id: 'profile', path: '/dashboard/profile', icon: 'fa-user', labelAr: 'الملف الشخصي', labelEn: 'Profile' },
     { id: 'invoices', path: '/dashboard/invoices', icon: 'fa-file-invoice-dollar', labelAr: 'الفواتير', labelEn: 'Invoices' },
     { id: 'requests', path: '/dashboard/requests', icon: 'fa-envelope', labelAr: 'الطلبات', labelEn: 'Requests' },

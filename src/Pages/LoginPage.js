@@ -1,504 +1,420 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/AuthContext';
 import axios from 'axios';
 import { Watch } from 'react-loader-spinner';
 import { Store } from 'react-notifications-component';
-import LanguageSwitcher from '../CustomComponents/LanguageSwitcher';
 import { API_BASE_URL } from '../config';
-import '../Css/login.css';
 import DashboardFooter from '../Components/DashboardFooter';
+import '../Css/login.css';
+
+// ── view constants ────────────────────────────────────────────────────────────
+
+const VIEW = {
+  LOGIN:          'login',
+  OTP:            'otp',
+  FORGOT:         'forgot',
+  RESET:          'reset',
+  CREATE_ADMIN:   'create_admin',
+};
+
+// ── reducer: one source of truth for all form state ──────────────────────────
+
+const INIT = {
+  view:        VIEW.LOGIN,
+  isAdmin:     false,
+  loading:     false,
+  error:       '',
+  showPass:    false,
+  // login
+  login:       '',
+  password:    '',
+  // otp
+  otp:         '',
+  tempPhone:   '',
+  // forgot
+  forgotPhone: '',
+  // reset
+  newPass:     '',
+  newPassConf: '',
+  // create admin
+  adminName:   '',
+  adminEmail:  '',
+  adminPass:   '',
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET':        return { ...state, [action.key]: action.value };
+    case 'MERGE':      return { ...state, ...action.payload };
+    case 'SET_VIEW':   return { ...state, view: action.view, error: '', loading: false };
+    case 'SET_ERROR':  return { ...state, error: action.error, loading: false };
+    case 'SET_LOADING':return { ...state, loading: action.loading };
+    case 'RESET_PASS_FIELDS': return { ...state, newPass: '', newPassConf: '', error: '' };
+    default: return state;
+  }
+}
+
+// ── tiny helpers ──────────────────────────────────────────────────────────────
+
+function notify(title, message, type = 'success') {
+  Store.addNotification({
+    title, message, type,
+    insert: 'top', container: 'top-right',
+    dismiss: { duration: type === 'danger' ? 5000 : 3000, onScreen: true },
+  });
+}
+
+function FieldError({ msg }) {
+  if (!msg) return null;
+  return (
+    <div className="lp-error" role="alert">
+      <i className="fas fa-circle-exclamation" aria-hidden="true"></i>
+      {msg}
+    </div>
+  );
+}
+
+function Spinner({ size = 20 }) {
+  return <Watch height={size} width={size} radius="9" color="#ffffff" ariaLabel="loading" />;
+}
+
+// ── sub-views (each is a pure presentational slice) ───────────────────────────
+
+const LoginForm = ({ s, dispatch, onSubmit }) => (
+  <form onSubmit={onSubmit} className="lp-form" noValidate>
+    <div className="lp-field">
+      <label htmlFor="lp-login">
+        {s.isAdmin ? 'البريد الإلكتروني' : 'البريد / الجوال / الهوية'}
+      </label>
+      <input
+        id="lp-login" type="text" autoComplete="username"
+        value={s.login} disabled={s.loading}
+        placeholder={s.isAdmin ? 'admin@example.com' : 'ادخل بريدك أو جوالك أو هويتك'}
+        onChange={e => dispatch({ type: 'MERGE', payload: { login: e.target.value, error: '' } })}
+      />
+    </div>
+
+    <div className="lp-field">
+      <label htmlFor="lp-password">كلمة المرور</label>
+      <div className="lp-pass-wrap">
+        <input
+          id="lp-password" autoComplete="current-password"
+          type={s.showPass ? 'text' : 'password'}
+          value={s.password} disabled={s.loading}
+          placeholder="••••••••"
+          onChange={e => dispatch({ type: 'MERGE', payload: { password: e.target.value, error: '' } })}
+        />
+        <button type="button" className="lp-pass-toggle"
+          onClick={() => dispatch({ type: 'SET', key: 'showPass', value: !s.showPass })}
+          aria-label={s.showPass ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>
+          <i className={`fas ${s.showPass ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <FieldError msg={s.error} />
+
+    <button type="submit" className="lp-btn lp-btn--primary" disabled={s.loading}>
+      {s.loading ? <><Spinner /> <span>جاري تسجيل الدخول...</span></> : 'تسجيل الدخول'}
+    </button>
+
+    {!s.isAdmin && (
+      <button type="button" className="lp-link-btn"
+        onClick={() => dispatch({ type: 'SET_VIEW', view: VIEW.FORGOT })}>
+        نسيت كلمة المرور؟
+      </button>
+    )}
+  </form>
+);
+
+const OtpView = ({ s, dispatch, onVerify }) => (
+  <div className="lp-form">
+    <div className="lp-otp-intro">
+      <i className="fas fa-mobile-screen-button lp-otp-icon" aria-hidden="true"></i>
+      <p>تم إرسال رمز التحقق إلى جوالك</p>
+    </div>
+    <div className="lp-field">
+      <label htmlFor="lp-otp">رمز التحقق (OTP)</label>
+      <input id="lp-otp" type="text" inputMode="numeric" maxLength={6}
+        value={s.otp} disabled={s.loading} placeholder="أدخل الرمز المكون من 6 أرقام" dir="ltr"
+        onChange={e => dispatch({ type: 'MERGE', payload: { otp: e.target.value, error: '' } })} />
+    </div>
+    <FieldError msg={s.error} />
+    <button type="button" className="lp-btn lp-btn--primary" disabled={s.loading || !s.otp} onClick={onVerify}>
+      {s.loading ? <><Spinner /> <span>جاري التحقق...</span></> : 'تحقق'}
+    </button>
+    <button type="button" className="lp-link-btn"
+      onClick={() => dispatch({ type: 'MERGE', payload: { view: VIEW.LOGIN, otp: '', error: '' } })}>
+      العودة لتسجيل الدخول
+    </button>
+  </div>
+);
+
+const ForgotView = ({ s, dispatch, onSubmit }) => (
+  <form onSubmit={onSubmit} className="lp-form" noValidate>
+    <p className="lp-form-desc">أدخل رقم الهاتف المسجل لديك</p>
+    <div className="lp-field">
+      <label htmlFor="lp-forgot-phone">رقم الهاتف   </label>
+      <input id="lp-forgot-phone" type="text" value={s.forgotPhone} disabled={s.loading}
+        placeholder="أدخل رقم الهاتف   "
+        onChange={e => dispatch({ type: 'MERGE', payload: { forgotPhone: e.target.value, error: '' } })} />
+    </div>
+    <FieldError msg={s.error} />
+    <div className="lp-btn-row">
+      <button type="submit" className="lp-btn lp-btn--primary" disabled={s.loading}>
+        {s.loading ? <><Spinner /> <span>...</span></> : 'التالي'}
+      </button>
+      <button type="button" className="lp-btn lp-btn--ghost"
+        onClick={() => dispatch({ type: 'SET_VIEW', view: VIEW.LOGIN })}>إلغاء</button>
+    </div>
+  </form>
+);
+
+const ResetView = ({ s, dispatch, onSubmit }) => (
+  <form onSubmit={onSubmit} className="lp-form" noValidate>
+    <p className="lp-form-desc">اختر كلمة مرور جديدة لحسابك</p>
+    <div className="lp-field">
+      <label htmlFor="lp-new-pass">كلمة المرور الجديدة</label>
+      <input id="lp-new-pass" type="password" autoComplete="new-password"
+        value={s.newPass} disabled={s.loading} placeholder="6 أحرف على الأقل"
+        onChange={e => dispatch({ type: 'MERGE', payload: { newPass: e.target.value, error: '' } })} />
+    </div>
+    <div className="lp-field">
+      <label htmlFor="lp-new-pass-conf">تأكيد كلمة المرور</label>
+      <input id="lp-new-pass-conf" type="password" autoComplete="new-password"
+        value={s.newPassConf} disabled={s.loading} placeholder="أعد إدخال كلمة المرور"
+        onChange={e => dispatch({ type: 'MERGE', payload: { newPassConf: e.target.value, error: '' } })} />
+    </div>
+    <FieldError msg={s.error} />
+    <button type="submit" className="lp-btn lp-btn--primary" disabled={s.loading}>
+      {s.loading ? <><Spinner /> <span>جاري الحفظ...</span></> : 'حفظ والدخول'}
+    </button>
+  </form>
+);
+
+const CreateAdminView = ({ s, dispatch, onSubmit }) => (
+  <form onSubmit={onSubmit} className="lp-form" noValidate>
+    <p className="lp-form-desc">إنشاء حساب مدير النظام (لأول مرة فقط)</p>
+    <div className="lp-field">
+      <label htmlFor="lp-admin-name">الاسم</label>
+      <input id="lp-admin-name" type="text" value={s.adminName} disabled={s.loading}
+        placeholder="مدير النظام"
+        onChange={e => dispatch({ type: 'MERGE', payload: { adminName: e.target.value, error: '' } })} />
+    </div>
+    <div className="lp-field">
+      <label htmlFor="lp-admin-email">البريد الإلكتروني</label>
+      <input id="lp-admin-email" type="email" value={s.adminEmail} disabled={s.loading}
+        placeholder="admin@example.com"
+        onChange={e => dispatch({ type: 'MERGE', payload: { adminEmail: e.target.value, error: '' } })} />
+    </div>
+    <div className="lp-field">
+      <label htmlFor="lp-admin-pass">كلمة المرور</label>
+      <input id="lp-admin-pass" type="password" value={s.adminPass} disabled={s.loading}
+        placeholder="••••••••"
+        onChange={e => dispatch({ type: 'MERGE', payload: { adminPass: e.target.value, error: '' } })} />
+    </div>
+    <FieldError msg={s.error} />
+    <div className="lp-btn-row">
+      <button type="submit" className="lp-btn lp-btn--primary" disabled={s.loading}>
+        {s.loading ? <><Spinner /> <span>جاري الإنشاء...</span></> : 'إنشاء الحساب'}
+      </button>
+      <button type="button" className="lp-btn lp-btn--ghost"
+        onClick={() => dispatch({ type: 'SET_VIEW', view: VIEW.LOGIN })}>إلغاء</button>
+    </div>
+  </form>
+);
+
+// ── view titles ───────────────────────────────────────────────────────────────
+
+const VIEW_META = {
+  [VIEW.LOGIN]:        { title: null },
+  [VIEW.OTP]:          { title: 'التحقق من الهوية' },
+  [VIEW.FORGOT]:       { title: 'استعادة كلمة المرور' },
+  [VIEW.RESET]:        { title: 'تعيين كلمة مرور جديدة' },
+  [VIEW.CREATE_ADMIN]: { title: 'إنشاء حساب مدير' },
+};
+
+// ── main component ────────────────────────────────────────────────────────────
 
 const LoginPage = () => {
-  const [loginData, setLoginData] = useState({ login: '', password: '' });
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showOTP, setShowOTP] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [tempUser, setTempUser] = useState(null);
-  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
-  const [createAdminForm, setCreateAdminForm] = useState({ email: '', password: '', name: '' });
-  const [showResetPassword, setShowResetPassword] = useState(false);
-  const [resetForm, setResetForm] = useState({ password: '', password_confirmation: '' });
-  const [showPassword, setShowPassword] = useState(false);
-  const { t, i18n } = useTranslation(['common']);
+  const { i18n }                          = useTranslation(['common']);
   const { login, isAuthenticated, userType, resetPassword } = useAuth();
-  const navigate = useNavigate();
+  const navigate                          = useNavigate();
+  const [s, dispatch]                     = useReducer(reducer, INIT);
 
-  // Redirect if already authenticated
+  // ── redirect if already authenticated ──────────────────────────────────────
   useEffect(() => {
-    if (isAuthenticated) {
-      if (userType === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
-    }
+    if (!isAuthenticated) return;
+    navigate(userType === 'admin' ? '/admin/dashboard' : '/dashboard', { replace: true });
   }, [isAuthenticated, userType, navigate]);
 
-  // Set RTL/LTR based on language
+  // ── RTL / LTR ──────────────────────────────────────────────────────────────
   useEffect(() => {
     const lang = i18n.language || 'ar';
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('dir',  lang === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', lang);
   }, [i18n.language]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setLoginData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setError('');
-  };
+  // ── handlers ────────────────────────────────────────────────────────────────
 
-  const handleSubmit = async (e) => {
+  const handleLogin = useCallback(async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    if (!loginData.login || !loginData.password) {
-      setError(t('login.error.required_fields'));
-      setLoading(false);
+    if (!s.login || !s.password) {
+      dispatch({ type: 'SET_ERROR', error: 'يرجى ملء جميع الحقول المطلوبة.' });
       return;
     }
+    dispatch({ type: 'SET_LOADING', loading: true });
 
-    const result = await login(loginData, isAdmin);
+    const result = await login({ login: s.login, password: s.password }, s.isAdmin);
 
-    // 🔥 OTP flow: first login requires verification
     if (result.success && result.requiresOTP) {
-      setTempUser(result.user);
-      setShowOTP(true);
-      setLoading(false);
+      dispatch({ type: 'MERGE', payload: { view: VIEW.OTP, tempPhone: result.user?.phone || '', loading: false } });
       return;
     }
 
     if (result.success) {
-      Store.addNotification({
-        title: t('login.success.title'),
-        message: t('login.success.message'),
-        type: 'success',
-        insert: 'top',
-        container: 'top-right',
-        dismiss: {
-          duration: 3000,
-          onScreen: true
-        }
-      });
-      // Force full page reload to bypass cache and ensure latest version loads
+      notify('مرحباً بك!', 'تم تسجيل الدخول بنجاح.');
       if (result.redirectPath) {
-        // Mark that we just logged in (for stale cache detection)
         sessionStorage.setItem('just_logged_in', 'true');
-        // Add cache-busting parameter and use window.location to force hard reload
-        const separator = result.redirectPath.includes('?') ? '&' : '?';
-        window.location.href = `${result.redirectPath}${separator}_t=${Date.now()}`;
+        const sep = result.redirectPath.includes('?') ? '&' : '?';
+        window.location.href = `${result.redirectPath}${sep}_t=${Date.now()}`;
       }
     } else {
-      setError(result.error || t('login.error.invalid_credentials'));
-      Store.addNotification({
-        title: t('login.error.title'),
-        message: result.error || t('login.error.invalid_credentials'),
-        type: 'danger',
-        insert: 'top',
-        container: 'top-right',
-        dismiss: {
-          duration: 5000,
-          onScreen: true
-        }
-      });
+      dispatch({ type: 'SET_ERROR', error: result.error || 'بيانات الدخول غير صحيحة.' });
     }
+  }, [s.login, s.password, s.isAdmin, login]);
 
-    setLoading(false);
-  };
-
-  const handleVerifyOTP = async () => {
-    setError('');
-    if (!otpCode) {
-      setError('الرجاء إدخال رمز OTP');
-      return;
-    }
-    if (!tempUser) {
-      setError('بيانات المستخدم غير متوفرة');
-      return;
-    }
-
+  const handleVerifyOtp = useCallback(async () => {
+    if (!s.otp) { dispatch({ type: 'SET_ERROR', error: 'يرجى إدخال رمز التحقق.' }); return; }
+    dispatch({ type: 'SET_LOADING', loading: true });
     try {
-      setLoading(true);
-      await axios.post(
-        `${API_BASE_URL}/portallogistice/verify-otp`,
-        { phone: tempUser.phone, otp: otpCode },
-        { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-LANG': localStorage.getItem('i18nextLng') || 'ar' } }
+      await axios.post(`${API_BASE_URL}/portallogistice/verify-otp`,
+        { phone: s.tempPhone, otp: s.otp },
+        { headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-LANG': localStorage.getItem('i18nextLng') || 'ar' } }
       );
-      setShowOTP(false);
-      setShowResetPassword(true);
-      setOtpCode('');
-    } catch (e) {
-      const d = e.response?.data;
-      if (e.response?.status === 422 && d?.errors) {
-        const first = Object.values(d.errors)[0];
-        setError(Array.isArray(first) ? first[0] : first);
-      } else {
-        setError(d?.message || d?.error || 'رمز التحقق غير صحيح أو منتهي');
-      }
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'MERGE', payload: { view: VIEW.RESET, otp: '', error: '', loading: false } });
+    } catch (err) {
+      const d    = err.response?.data;
+      const first = d?.errors ? Object.values(d.errors)[0] : null;
+      dispatch({ type: 'SET_ERROR', error: (Array.isArray(first) ? first[0] : first) || d?.message || 'رمز التحقق غير صحيح.' });
     }
-  };
+  }, [s.otp, s.tempPhone]);
 
-  const handleResetPasswordChange = (e) => {
-    const { name, value } = e.target;
-    setResetForm(prev => ({ ...prev, [name]: value }));
-    setError('');
-  };
-
-  const handleResetPassword = async (e) => {
+  const handleForgot = useCallback(async (e) => {
     e.preventDefault();
-    setError('');
-    if (!tempUser?.phone) {
-      setError('بيانات المستخدم غير متوفرة');
-      return;
+    if (!s.forgotPhone) { dispatch({ type: 'SET_ERROR', error: 'يرجى إدخال رقم الهاتف أو البريد.' }); return; }
+    dispatch({ type: 'MERGE', payload: { view: VIEW.RESET, tempPhone: s.forgotPhone, error: '' } });
+  }, [s.forgotPhone]);
+
+  const handleReset = useCallback(async (e) => {
+    e.preventDefault();
+    if (!s.newPass || !s.newPassConf)     { dispatch({ type: 'SET_ERROR', error: 'أدخل كلمة المرور وتأكيدها.' }); return; }
+    if (s.newPass !== s.newPassConf)      { dispatch({ type: 'SET_ERROR', error: 'كلمتا المرور غير متطابقتين.' }); return; }
+    if (s.newPass.length < 6)            { dispatch({ type: 'SET_ERROR', error: 'كلمة المرور 6 أحرف على الأقل.' }); return; }
+    dispatch({ type: 'SET_LOADING', loading: true });
+    const result = await resetPassword(s.tempPhone, s.newPass, s.newPassConf);
+    if (result.success) {
+      notify('تم',  'تم تغيير كلمة المرور. سجّل الدخول الآن.');
+      dispatch({ type: 'MERGE', payload: { view: VIEW.LOGIN, newPass: '', newPassConf: '', tempPhone: '', error: '', loading: false } });
+    } else {
+      dispatch({ type: 'SET_ERROR', error: result.error || 'فشل تغيير كلمة المرور.' });
     }
-    if (!resetForm.password || !resetForm.password_confirmation) {
-      setError('أدخل كلمة المرور وتأكيدها');
-      return;
+  }, [s.newPass, s.newPassConf, s.tempPhone, resetPassword]);
+
+  const handleCreateAdmin = useCallback(async (e) => {
+    e.preventDefault();
+    if (!s.adminName || !s.adminEmail || !s.adminPass) {
+      dispatch({ type: 'SET_ERROR', error: 'يرجى تعبئة جميع الحقول.' }); return;
     }
-    if (resetForm.password !== resetForm.password_confirmation) {
-      setError('كلمتا المرور غير متطابقتين');
-      return;
-    }
-    if (resetForm.password.length < 6) {
-      setError('كلمة المرور 6 أحرف على الأقل');
-      return;
-    }
+    dispatch({ type: 'SET_LOADING', loading: true });
     try {
-      setLoading(true);
-      const result = await resetPassword(tempUser.phone, resetForm.password, resetForm.password_confirmation);
-      if (result.success) {
-        Store.addNotification({
-          title: 'تم',
-          message: result.message || 'تم تغيير كلمة المرور. سجّل الدخول الآن.',
-          type: 'success',
-          insert: 'top',
-          container: 'top-right',
-          dismiss: { duration: 4000, onScreen: true }
-        });
-        setShowResetPassword(false);
-        setTempUser(null);
-        setResetForm({ password: '', password_confirmation: '' });
+      const res = await axios.post(`${API_BASE_URL}/portallogistice/admin/register`,
+        { name: s.adminName, email: s.adminEmail, password: s.adminPass },
+        { headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-LANG': localStorage.getItem('i18nextLng') || 'ar' } }
+      );
+      if (res.data?.success) {
+        notify('تم', res.data.message || 'تم إنشاء حساب المدير. يمكنك تسجيل الدخول الآن.');
+        dispatch({ type: 'MERGE', payload: { view: VIEW.LOGIN, login: s.adminEmail, adminName: '', adminEmail: '', adminPass: '', error: '', loading: false } });
       } else {
-        setError(result.error || 'فشل تغيير كلمة المرور');
+        dispatch({ type: 'SET_ERROR', error: res.data?.message || 'فشل إنشاء الحساب.' });
       }
     } catch (err) {
-      setError(err.message || 'فشل تغيير كلمة المرور');
-    } finally {
-      setLoading(false);
+      const d     = err.response?.data;
+      const first = d?.errors ? Object.values(d.errors)[0] : null;
+      dispatch({ type: 'SET_ERROR', error: (Array.isArray(first) ? first[0] : first) || d?.message || 'خطأ في الشبكة.' });
     }
-  };
+  }, [s.adminName, s.adminEmail, s.adminPass]);
 
-  const handleCreateAdminChange = (e) => {
-    const { name, value } = e.target;
-    setCreateAdminForm(prev => ({ ...prev, [name]: value }));
-    setError('');
-  };
+  // ── render ────────────────────────────────────────────────────────────────
 
-  const handleCreateAdmin = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (!createAdminForm.email || !createAdminForm.password || !createAdminForm.name) {
-      setError('الرجاء تعبئة البريد وكلمة المرور والاسم');
-      return;
-    }
-    try {
-      setLoading(true);
-      const res = await axios.post(
-        `${API_BASE_URL}/portallogistice/admin/register`,
-        {
-          email: createAdminForm.email,
-          password: createAdminForm.password,
-          name: createAdminForm.name
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-LANG': localStorage.getItem('i18nextLng') || 'ar'
-          }
-        }
-      );
-      if (res.data && res.data.success) {
-        const createdEmail = createAdminForm.email;
-        Store.addNotification({
-          title: 'تم',
-          message: res.data.message || 'تم إنشاء حساب المدير. يمكنك تسجيل الدخول الآن.',
-          type: 'success',
-          insert: 'top',
-          container: 'top-right',
-          dismiss: { duration: 4000, onScreen: true }
-        });
-        setShowCreateAdmin(false);
-        setCreateAdminForm({ email: '', password: '', name: '' });
-        setLoginData(prev => ({ ...prev, login: createdEmail }));
-      } else {
-        setError(res.data?.message || 'فشل إنشاء الحساب');
-      }
-    } catch (err) {
-      const d = err.response?.data;
-      let msg = err.message || 'خطأ في الشبكة أو الـ API غير مفعّل';
-      if (err.response?.status === 422 && d?.errors) {
-        const first = Object.values(d.errors)[0];
-        msg = Array.isArray(first) ? first[0] : first;
-      } else if (d?.message) msg = d.message;
-      else if (d?.error) msg = d.error;
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const lang = i18n.language || 'ar';
-  const isRTL = lang === 'ar';
+  const viewMeta  = VIEW_META[s.view] || {};
+  const showToggle = s.view === VIEW.LOGIN;
 
   return (
-    <div className="login-page" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="login-container">
-        <div className="login-header">
-          <img src="/assets/images/logo.png" alt="Logo" className="login-logo" />
-          <h1 className="login-title">{t('login.title')}</h1>
-          <p className="login-subtitle">{t('login.subtitle')}</p>
+    <div className="lp-page" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="lp-card">
+
+        {/* logo + branding */}
+        <div className="lp-brand">
+          <img src="/assets/images/logo.png" alt="شعار البوابة" className="lp-logo" />
+          <h1 className="lp-app-name">بوابة المستثمر</h1>
+          <p className="lp-app-sub">منصة إدارة عقود التسهيل اللوجستي</p>
         </div>
 
-        <div className="login-toggle">
-          <button
-            type="button"
-            className={`toggle-btn ${!isAdmin ? 'active' : ''}`}
-            onClick={() => setIsAdmin(false)}
-          >
-            {t('login.user_login')}
-          </button>
-          <button
-            type="button"
-            className={`toggle-btn ${isAdmin ? 'active' : ''}`}
-            onClick={() => setIsAdmin(true)}
-          >
-            {t('login.admin_login')}
-          </button>
-        </div>
-
-        {!showOTP && !showResetPassword && (
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="login">
-              {isAdmin ? t('login.email') : t('login.email_phone_national_id')}
-            </label>
-            <input
-              type="text"
-              id="login"
-              name="login"
-              value={loginData.login}
-              onChange={handleInputChange}
-              placeholder={isAdmin ? t('login.email_placeholder') : t('login.email_phone_national_id_placeholder')}
-              className="form-control"
-              disabled={loading}
-              autoComplete="username"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">{t('login.password')}</label>
-            <div className="login-password-field">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={loginData.password}
-                onChange={handleInputChange}
-                placeholder={t('login.password_placeholder')}
-                className="form-control login-password-input"
-                disabled={loading}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                className="login-password-toggle"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
-                aria-pressed={showPassword}
-                disabled={loading}
-              >
-                <i
-                  className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="login-btn primary-btn"
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="btn-loader">
-                <Watch
-                  height="20"
-                  width="20"
-                  radius="9"
-                  color="#ffffff"
-                  ariaLabel="loading"
-                />
-                <span style={{ marginLeft: '8px' }}>{t('login.loading')}</span>
-              </div>
-            ) : (
-              t('login.login_button')
-            )}
-          </button>
-        </form>
-        )}
-
-        {showOTP && (
-          <div style={{ marginTop: '20px' }}>
-            <h3>رمز التحقق</h3>
-            <input
-              type="text"
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value)}
-              placeholder="أدخل رمز OTP"
-              className="form-control"
-              disabled={loading}
-            />
+        {/* user / admin toggle */}
+        {showToggle && (
+          <div className="lp-toggle" role="tablist" aria-label="نوع الحساب">
             <button
-              onClick={handleVerifyOTP}
-              className="login-btn primary-btn"
-              disabled={loading}
-              style={{ marginTop: 10 }}
+              role="tab"
+              aria-selected={!s.isAdmin}
+              className={`lp-toggle-btn${!s.isAdmin ? ' lp-toggle-btn--active' : ''}`}
+              onClick={() => dispatch({ type: 'MERGE', payload: { isAdmin: false, error: '' } })}
               type="button"
             >
-              تحقق
+              <i className="fas fa-user" aria-hidden="true"></i>
+              مستثمر
             </button>
-            {error && <div className="error-message" style={{ marginTop: 8 }}>{error}</div>}
+            <button
+              role="tab"
+              aria-selected={s.isAdmin}
+              className={`lp-toggle-btn${s.isAdmin ? ' lp-toggle-btn--active' : ''}`}
+              onClick={() => dispatch({ type: 'MERGE', payload: { isAdmin: true, error: '' } })}
+              type="button"
+            >
+              <i className="fas fa-shield-halved" aria-hidden="true"></i>
+              مدير النظام
+            </button>
           </div>
         )}
 
-        {showResetPassword && (
-          <form onSubmit={handleResetPassword} className="login-form" style={{ marginTop: 20 }}>
-            <h3>تعيين كلمة مرور جديدة</h3>
-            <div className="form-group">
-              <label>كلمة المرور الجديدة</label>
-              <input
-                type="password"
-                name="password"
-                value={resetForm.password}
-                onChange={handleResetPasswordChange}
-                placeholder="6 أحرف على الأقل"
-                className="form-control"
-                disabled={loading}
-                autoComplete="new-password"
-              />
-            </div>
-            <div className="form-group">
-              <label>تأكيد كلمة المرور</label>
-              <input
-                type="password"
-                name="password_confirmation"
-                value={resetForm.password_confirmation}
-                onChange={handleResetPasswordChange}
-                placeholder="أعد إدخال كلمة المرور"
-                className="form-control"
-                disabled={loading}
-                autoComplete="new-password"
-              />
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <button type="submit" className="login-btn primary-btn" disabled={loading} style={{ marginTop: 12 }}>
-              {loading ? 'جاري الحفظ...' : 'حفظ والذهاب لتسجيل الدخول'}
-            </button>
-          </form>
+        {/* view sub-title */}
+        {viewMeta.title && (
+          <div className="lp-view-header">
+            <h2 className="lp-view-title">{viewMeta.title}</h2>
+          </div>
         )}
 
-        {isAdmin && !showCreateAdmin && !showOTP && !showResetPassword && (
-          <p style={{ marginTop: 12, fontSize: 14 }}>
-            <button
-              type="button"
-              onClick={() => setShowCreateAdmin(true)}
-              style={{ background: 'none', border: 'none', color: '#073491', cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              إنشاء حساب مدير (أول مرة)
-            </button>
-          </p>
+        {/* view router */}
+        {s.view === VIEW.LOGIN        && <LoginForm       s={s} dispatch={dispatch} onSubmit={handleLogin} />}
+        {s.view === VIEW.OTP          && <OtpView         s={s} dispatch={dispatch} onVerify={handleVerifyOtp} />}
+        {s.view === VIEW.FORGOT       && <ForgotView      s={s} dispatch={dispatch} onSubmit={handleForgot} />}
+        {s.view === VIEW.RESET        && <ResetView       s={s} dispatch={dispatch} onSubmit={handleReset} />}
+        {s.view === VIEW.CREATE_ADMIN && <CreateAdminView s={s} dispatch={dispatch} onSubmit={handleCreateAdmin} />}
+
+        {/* create admin link — only on admin login, main view */}
+        {s.view === VIEW.LOGIN && s.isAdmin && (
+          <button type="button" className="lp-link-btn lp-link-btn--muted"
+            onClick={() => dispatch({ type: 'SET_VIEW', view: VIEW.CREATE_ADMIN })}>
+            إنشاء حساب مدير (لأول مرة)
+          </button>
         )}
 
-        {showCreateAdmin && (
-          <form onSubmit={handleCreateAdmin} className="login-form" style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid #eee' }}>
-            <h3 style={{ marginBottom: 16 }}>إنشاء حساب مدير</h3>
-            <div className="form-group">
-              <label>الاسم</label>
-              <input
-                type="text"
-                name="name"
-                value={createAdminForm.name}
-                onChange={handleCreateAdminChange}
-                placeholder="مدير النظام"
-                className="form-control"
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label>البريد الإلكتروني</label>
-              <input
-                type="email"
-                name="email"
-                value={createAdminForm.email}
-                onChange={handleCreateAdminChange}
-                placeholder="info@shellafood.com"
-                className="form-control"
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label>كلمة المرور</label>
-              <input
-                type="password"
-                name="password"
-                value={createAdminForm.password}
-                onChange={handleCreateAdminChange}
-                placeholder="••••••••"
-                className="form-control"
-                disabled={loading}
-              />
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-              <button type="submit" className="login-btn primary-btn" disabled={loading}>
-                {loading ? 'جاري الإنشاء...' : 'إنشاء الحساب'}
-              </button>
-              <button
-                type="button"
-                className="toggle-btn"
-                onClick={() => { setShowCreateAdmin(false); setError(''); }}
-              >
-                إلغاء
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* <div className="login-footer">
-          <LanguageSwitcher />
-        </div> */}
-        <DashboardFooter/>
+        <DashboardFooter />
       </div>
     </div>
   );
 };
 
 export default LoginPage;
-

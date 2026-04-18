@@ -68,6 +68,60 @@ const RejectModal = ({ req, onClose, onSuccess }) => {
   );
 };
 
+// ── WhatsappModal ─────────────────────────────────────────────────────────────
+
+const WhatsappModal = ({ req, onClose, onSuccess }) => {
+  const { getAuthHeaders } = useAuth();
+  const [message, setMessage]   = useState('');
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState('');
+
+  const submit = async () => {
+    if (!message.trim()) {
+      setError('أدخل نص الرسالة.');
+      return;
+    }
+    setSaving(true); setError('');
+    try {
+      const res = await axios.post(`${API_BASE_URL}/admin/requests/${req.id}/send-whatsapp`,
+        { message: message.trim() }, { headers: getAuthHeaders() });
+      onSuccess(res.data?.data);
+    } catch (e) { setError(e?.response?.data?.message || 'تعذر إرسال رسالة الواتساب.'); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="arq-overlay" onClick={e => e.target === e.currentTarget && !saving && onClose()}>
+      <div className="arq-modal arq-modal--sm">
+        <div className="arq-modal-head">
+          <h3 className="arq-modal-title">إرسال رسالة واتساب</h3>
+          <button type="button" className="arq-modal-close" onClick={onClose} disabled={saving} aria-label="إغلاق"><i className="fas fa-times"></i></button>
+        </div>
+        <p className="arq-modal-desc">إلى: <strong>{req.full_name}</strong> — {req.phone}</p>
+        <div className="arq-modal-field">
+          <label className="arq-field-label">نص الرسالة *</label>
+          <textarea 
+            className="arq-textarea"
+            rows={4}
+            placeholder="اكتب رسالة الواتساب..."
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            maxLength={4096}
+          />
+          <span className="arq-field-hint">{message.length} / 4096</span>
+        </div>
+        {error && <div className="arq-modal-error" role="alert"><i className="fas fa-triangle-exclamation"></i> {error}</div>}
+        <div className="arq-modal-foot">
+          <button type="button" className="arq-btn arq-btn--ghost" onClick={onClose} disabled={saving}>إلغاء</button>
+          <button type="button" className="arq-btn arq-btn--primary" onClick={submit} disabled={saving || !message.trim()}>
+            {saving ? <><i className="fas fa-spinner fa-spin"></i> جاري الإرسال...</> : <><i className="fab fa-whatsapp"></i> إرسال</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── InvoiceViewerModal ───────────────────────────────────────────────────────
 
 const InvoiceViewerModal = ({ invoicePath, onClose }) => {
@@ -287,6 +341,7 @@ const AdminRequestsPage = () => {
   const [loading, setLoading]       = useState(true);
   const [actioning, setActioning]   = useState(null);
   const [rejectModal, setRejectModal]   = useState(null);
+  const [whatsappModal, setWhatsappModal] = useState(null);
   const [deployModal, setDeployModal]   = useState(null);
   const [invoiceViewer, setInvoiceViewer] = useState(null);
   const [feedback, setFeedback]         = useState('');
@@ -324,15 +379,11 @@ const AdminRequestsPage = () => {
     finally { setActioning(null); }
   };
 
-  const handleWhatsapp = async (req) => {
-    setActioning(req.id);
-    try {
-      const res = await axios.post(`${API_BASE_URL}/admin/requests/${req.id}/send-whatsapp`, {}, { headers: getAuthHeaders() });
-      setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'whatsapp_sent' } : r));
-      setFeedback(`تم إرسال واتساب لـ ${req.phone}`);
-      setTimeout(() => setFeedback(''), 4000);
-    } catch (e) { alert(e?.response?.data?.message || 'تعذر إرسال الواتساب.'); }
-    finally { setActioning(null); }
+  const handleWhatsappSuccess = (updated) => {
+    setWhatsappModal(null);
+    setRequests(prev => prev.map(r => r.id === updated.id ? updated : r));
+    setFeedback(`تم إرسال واتساب لـ ${updated.phone}`);
+    setTimeout(() => setFeedback(''), 4000);
   };
 
   const handleRejectSuccess = (updated) => {
@@ -354,6 +405,7 @@ const AdminRequestsPage = () => {
   return (
     <div className="arq-page" dir="rtl">
       {rejectModal && <RejectModal req={rejectModal} onClose={() => setRejectModal(null)} onSuccess={handleRejectSuccess} />}
+      {whatsappModal && <WhatsappModal req={whatsappModal} onClose={() => setWhatsappModal(null)} onSuccess={handleWhatsappSuccess} />}
       {deployModal && <DeployContractModal req={deployModal} onClose={() => setDeployModal(null)} onSuccess={handleDeploySuccess} />}
       {invoiceViewer && <InvoiceViewerModal invoicePath={invoiceViewer} onClose={() => setInvoiceViewer(null)} />}
 
@@ -446,7 +498,7 @@ const AdminRequestsPage = () => {
                   <RequestRow key={req.id} req={req}
                     onApprove={handleApprove}
                     onReject={setRejectModal}
-                    onWhatsapp={handleWhatsapp}
+                    onWhatsapp={setWhatsappModal}
                     onDeploy={setDeployModal}
                     onViewInvoice={setInvoiceViewer}
                     actioning={actioning}
