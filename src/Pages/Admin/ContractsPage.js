@@ -175,7 +175,7 @@ const AdminContractsPage = () => {
   const [reviewModal, setReviewModal]     = useState(null); // contract to review
   const [reviewResult, setReviewResult]   = useState(null); // feedback message
   const [form, setForm] = useState({ user_id: '', type: 'sale', title: '', file: null });
-
+const [summary, setSummary] = useState({});
   const fetchUsers = useCallback(async (search = '') => {
     setUsersLoading(true);
     try {
@@ -194,6 +194,7 @@ const AdminContractsPage = () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/contracts`, { headers: getAuthHeaders() });
       setContracts(res.data?.data || []);
+      setSummary(res.data?.summary || {});
     } catch (e) {
       setError(e?.response?.data?.message || 'تعذر تحميل العقود.');
     } finally {
@@ -259,14 +260,31 @@ const AdminContractsPage = () => {
       setContracts(prev => prev.map(c => c.id === result.data.id ? result.data : c));
     }
   };
-
+ 
   const tabCounts = useMemo(() => ({
-    all:         contracts.length,
-    pending:     contracts.filter(TAB_FILTERS.pending).length,
-    need_to_pay: contracts.filter(TAB_FILTERS.need_to_pay).length,
-    approved:    contracts.filter(TAB_FILTERS.approved).length,
-    rejected:    contracts.filter(TAB_FILTERS.rejected).length,
-  }), [contracts]);
+    all:         summary.all_time?.total_count,
+    pending:    summary.all_time?.admin_pending_count,
+    need_to_pay: summary.all_time?.need_to_pay_count,
+    approved:    summary.all_time?.approved_count,
+    rejected:    summary.all_time?.rejected_count,
+  }), [summary]);
+  
+  const tabCountThisMonth = useMemo(() => ({
+    all:         summary.this_month?.total_count,
+    pending:    summary.this_month?.admin_pending_count,
+    need_to_pay: summary.this_month?.need_to_pay_count,
+    approved:    summary.this_month?.approved_count,
+    rejected:    summary.this_month?.rejected_count,
+  }), [summary]);
+
+  const tabCountThisWeek=useMemo(()=>({
+    all:         summary.this_week?.total_count,
+    pending:    summary.this_week?.admin_pending_count,
+    need_to_pay: summary.this_week?.need_to_pay_count,
+    approved:    summary.this_week?.approved_count,
+    rejected:    summary.this_week?.rejected_count,
+  }),[summary]
+)
 
   // ── render helpers ─────────────────────────────────────────────────────────
 
@@ -364,12 +382,48 @@ const AdminContractsPage = () => {
           <h2 className="acd-title">إدارة العقود</h2>
           <p className="acd-subtitle">إدارة دورة العقود من الإرسال حتى الاعتماد النهائي.</p>
         </div>
-        <div className="acd-stat-grid">
-          <div className="acd-stat-item"><span className="acd-stat-label">جميع</span><strong className="acd-stat-value">{tabCounts.all}</strong></div>
-          <div className="acd-stat-item"><span className="acd-stat-label">قيد المراجعة</span><strong className="acd-stat-value">{tabCounts.pending}</strong></div>
-          <div className="acd-stat-item"><span className="acd-stat-label">بانتظار الدفع</span><strong className="acd-stat-value">{tabCounts.need_to_pay}</strong></div>
-          <div className="acd-stat-item"><span className="acd-stat-label">مقبولة</span><strong className="acd-stat-value">{tabCounts.approved}</strong></div>
-          <div className="acd-stat-item"><span className="acd-stat-label">مرفوضة</span><strong className="acd-stat-value">{tabCounts.rejected}</strong></div>
+        <div className="acd-stats-container">
+          <div className="acd-stat-section">
+            <h3 className="acd-stat-section-title">
+              <i className="fas fa-calendar-alt"></i>
+              جميع الأوقات
+            </h3>
+            <div className="acd-stat-grid">
+              <div className="acd-stat-item"><span className="acd-stat-label">جميع</span><strong className="acd-stat-value">{tabCounts.all}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">قيد المراجعة</span><strong className="acd-stat-value">{tabCounts.pending}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">بانتظار الدفع</span><strong className="acd-stat-value">{tabCounts.need_to_pay}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مقبولة</span><strong className="acd-stat-value">{tabCounts.approved}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مرفوضة</span><strong className="acd-stat-value">{tabCounts.rejected}</strong></div>
+            </div>
+          </div>
+
+          <div className="acd-stat-section">
+            <h3 className="acd-stat-section-title">
+              <i className="fas fa-calendar-week"></i>
+              هذا الأسبوع
+            </h3>
+            <div className="acd-stat-grid">
+              <div className="acd-stat-item"><span className="acd-stat-label">جميع</span><strong className="acd-stat-value">{tabCountThisWeek.all}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">قيد المراجعة</span><strong className="acd-stat-value">{tabCountThisWeek.pending}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">بانتظار الدفع</span><strong className="acd-stat-value">{tabCountThisWeek.need_to_pay}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مقبولة</span><strong className="acd-stat-value">{tabCountThisWeek.approved}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مرفوضة</span><strong className="acd-stat-value">{tabCountThisWeek.rejected}</strong></div>
+            </div>
+          </div>
+
+          <div className="acd-stat-section">
+            <h3 className="acd-stat-section-title">
+              <i className="fas fa-calendar-days"></i>
+              هذا الشهر
+            </h3>
+            <div className="acd-stat-grid">
+              <div className="acd-stat-item"><span className="acd-stat-label">جميع</span><strong className="acd-stat-value">{tabCountThisMonth.all}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">قيد المراجعة</span><strong className="acd-stat-value">{tabCountThisMonth.pending}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">بانتظار الدفع</span><strong className="acd-stat-value">{tabCountThisMonth.need_to_pay}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مقبولة</span><strong className="acd-stat-value">{tabCountThisMonth.approved}</strong></div>
+              <div className="acd-stat-item"><span className="acd-stat-label">مرفوضة</span><strong className="acd-stat-value">{tabCountThisMonth.rejected}</strong></div>
+            </div>
+          </div>
         </div>
       </div>
 
