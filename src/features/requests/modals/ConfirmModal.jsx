@@ -41,7 +41,7 @@ export function ConfirmModal({ requestType, contracts, user, onClose, onSuccess 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && !isSubmitting && onClose()}
     >
-      <div className=" dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className={`p-6 border-b border-gray-200 dark:border-gray-700 flex items-start gap-4`}>
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colors.icon}`}>

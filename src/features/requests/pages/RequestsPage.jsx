@@ -20,7 +20,6 @@ export default function RequestsPage() {
   const isAr = i18n.language === 'ar';
 
   const user = useAuthStore((state) => state.user);
-  console.log(user);
   const { data, isLoading, refetch } = useRequests();
   const { data: contracts = [] } = useRentalContracts();
 

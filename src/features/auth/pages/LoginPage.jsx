@@ -102,7 +102,7 @@ export default function LoginPage() {
           return;
         }
       } catch (err) {
-        dispatch({ type: 'SET_ERROR', error: err.message || 'بيانات الدخول غير صحيحة.' });
+        dispatch({ type: 'SET_ERROR', error: 'بيانات الدخول غير صحيحة.' });
       }
     },
     [s.login, s.password, s.isAdmin, loginMutation]

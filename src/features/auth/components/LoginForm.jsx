@@ -7,7 +7,7 @@ export function LoginForm({ state, onChange, onSubmit, onForgot }) {
     const { login, password, isAdmin, loading, error } = state;
 
     return (
-        <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+        <form className="flex flex-col gap-4" noValidate>
             <div className="flex flex-col gap-1.5">
                 <label htmlFor="login" className="text-[13px] font-semibold text-gray-700">
                     {isAdmin ? 'البريد الإلكتروني' : 'البريد / الجوال / الهوية'}
@@ -43,8 +43,9 @@ export function LoginForm({ state, onChange, onSubmit, onForgot }) {
             <FieldError message={error} />
 
             <button
-                type="submit"
+                type="button"
                 disabled={loading}
+                onClick={onSubmit}
                 className="flex w-full items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-[#073491] bg-[#073491] px-5 py-[11px]
                    text-sm font-bold text-white transition hover:bg-[#0a3fa3]
                    disabled:opacity-50 disabled:cursor-not-allowed"

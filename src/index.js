@@ -96,11 +96,9 @@ root.render(
             >
               <Route index element={<AdminStatisticsPage />} />
 
-              <Route path="users" element={<AdminUsersPage />}>
-                <Route index element={<AdminUsersPage />} />
-                <Route path=":userId/show" element={<AdminUserShowPage />} />
-                <Route path=":userId/update" element={<AdminUserUpdatePage />} />
-              </Route>
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="users/:userId/show" element={<AdminUserShowPage />} />
+              <Route path="users/:userId/update" element={<AdminUserUpdatePage />} />
               <Route path="investments" element={<AdminInvestmentsPage />} />
               <Route path="contracts" element={<AdminContractsPage />} />
               <Route path="invoices" element={<AdminInvoicesPage />} />

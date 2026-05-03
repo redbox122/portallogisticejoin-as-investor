@@ -2,6 +2,7 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/AuthContext';
+import { useAuthStore } from '../features/auth/stores/authStore';
 import UserSidebar from './UserSidebar';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
@@ -61,6 +62,10 @@ const DashboardLayout = () => {
 
     checkStaleCache();
   }, [i18n.language]);
+
+  useEffect(() => {
+    useAuthStore.getState().checkAuth();
+  }, []);
 
   useEffect(() => {
     const isDark = theme === 'dark';
