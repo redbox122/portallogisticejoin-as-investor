@@ -1,6 +1,4 @@
 
-text/x-generic deploy.sh ( Bourne-Again shell script, ASCII text executable )
-#!/usr/bin/env bash
 set -Eeuo pipefail
 export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 
