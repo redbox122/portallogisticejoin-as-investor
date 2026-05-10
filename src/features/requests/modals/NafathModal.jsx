@@ -79,7 +79,7 @@ export function NafathModal({ request, onClose, onSuccess }) {
               <p className="font-semibold text-gray-900 dark:text-white">تم إرسال الطلب إلى تطبيق نفاذ</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">يرجى فتح التطبيق واختيار الرقم للموافقة</p>
               {nafathCode && (
-                <div className="inline-block bg-gray-100 dark:bg-gray-700 rounded-xl px-6 py-3 font-mono text-lg font-bold text-gray-900 dark:text-white">
+                <div className="inline-block bg-white dark:bg-gray-700 rounded-xl px-6 py-3 font-mono text-lg font-bold text-gray-900 dark:text-white">
                   {nafathCode}
                 </div>
               )}
