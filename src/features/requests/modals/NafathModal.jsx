@@ -37,7 +37,7 @@ export function NafathModal({ request, onClose, onSuccess }) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 flex items-center justify-center">
@@ -79,7 +79,7 @@ export function NafathModal({ request, onClose, onSuccess }) {
               <p className="font-semibold text-gray-900 dark:text-white">تم إرسال الطلب إلى تطبيق نفاذ</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">يرجى فتح التطبيق واختيار الرقم للموافقة</p>
               {nafathCode && (
-                <div className="inline-block bg-white dark:bg-gray-700 rounded-xl px-6 py-3 font-mono text-lg font-bold text-gray-900 dark:text-white">
+                <div className="inline-block bg-gray-100 dark:bg-gray-700 rounded-xl px-6 py-3 font-mono text-lg font-bold text-gray-900 dark:text-white">
                   {nafathCode}
                 </div>
               )}
